@@ -1,10 +1,10 @@
 $(function () {
 	const canvas_sizing = function () {
 		$('.game').each(function () {
-			$('.game').css('height', $(this).width() * 0.45 + 'px');
+			$(this).css('height', $(this).width() * 0.45 + 'px');
+			this.width = $(this).width();
+			this.height = $(this).height();
 		});
-		$('.game')[0].width = $('.game').width();
-		$('.game')[0].height = $('.game').height();
 	}
 	canvas_sizing();
 	$(window).resize(canvas_sizing);
@@ -19,13 +19,14 @@ $(function () {
 		var socket;
 		var actual_state;
 		var arena;
+		var char;
 
 		const ctx = canvas.getContext('2d');
 
 		const Arena = function (arena) {
 			const collider = new Image();
 
-			collider.src = arena.src + '/collider.png';
+			collider.src = arena.src + 'collider.png';
 			this.complete = () => {
 				if (
 					collider.complete
@@ -52,28 +53,26 @@ $(function () {
 			};
 		}
 
-		const State = function State() {
-			if (arguments[0] instanceof Object) {
-				const parameters = arguments[0];
-
-				if (parameters.update) {
+		const State = function State(state) {
+			if (state instanceof Object) {
+				if (state.update) {
 					this.update = function (delta) {
-						parameters.update(delta);
+						state.update(delta);
 					}
 				}
-				if (parameters.draw) {
+				if (state.draw) {
 					this.draw = function (delta) {
-						parameters.draw(delta);
+						state.draw(delta);
 					}
 				}
-				if (parameters.start) {
+				if (state.start) {
 					this.start = function () {
-						parameters.start.apply(this, arguments);
+						state.start.apply(this, arguments);
 					}
 				}
-				if (parameters.end) {
+				if (state.end) {
 					this.end = function () {
-						parameters.end.apply(this, arguments);
+						state.end.apply(this, arguments);
 					}
 				}
 			} else {
@@ -97,6 +96,9 @@ $(function () {
 					socket = io();
 					socket.on('arena', function (ring) {
 						arena = new Arena(ring);
+					});
+					socket.on('char', function (character) {
+						char = new Char(character);
 					});
 				},
 
@@ -131,9 +133,6 @@ $(function () {
 
 										for (let i = x - 20; i < x + 20; i++) {
 											for (let j = y - 20; j < y + 20; j++) {
-												collider_data.data[pixel_index(i, j, collider_data.width)] = 255;
-												collider_data.data[pixel_index(i, j, collider_data.width) + 1] = 255;
-												collider_data.data[pixel_index(i, j, collider_data.width) + 2] = 255;
 												collider_data.data[pixel_index(i, j, collider_data.width) + 3] = 0;
 											}
 										}
@@ -142,8 +141,6 @@ $(function () {
 										arena.collider(collider_canvas.toDataURL());
 									}
 									console.log('start play');
-
-									
 
 									socket.on('explode', function (center) {
 										explode(center.x, center.y);

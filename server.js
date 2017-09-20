@@ -9,19 +9,22 @@ app.get('/', (request, response) => response.sendFile(__dirname + '/public/game.
 
 app.use(express.static(__dirname + '/public'));
 io.on('connection', socket => {
+	'use strict';
+
 	const match = `${matches.find(match => Object.keys(io.sockets.adapter.rooms[match].sockets).length < 2) || matches.slice(matches.push(`match_${matches.length}`) - 1).pop()}`;
 
-	const Arena = function() {
-		switch (arguments[0]) {
+	const Arena = function (arena) {
+		switch (arena) {
 			case 'teste': 
 				return new Arena({
-					src: '/assets/arenas/teste'
+					src: '/assets/arenas/teste/'
 				});
 			break;
 			default:
-				this.src = arguments[0].src;
+				this.src = arena.src;
+			break;
 		}
-	}
+	};
 
 	socket.join(match);
 	io.to(socket.id).in(match).emit('arena', Arena('teste'));
