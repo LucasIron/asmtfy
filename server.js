@@ -1,44 +1,137 @@
+'use strict';
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
-const matches = [];
-
-app.get('/', (request, response) => response.sendFile(__dirname + '/public/game.html'));
+const mongoose= require('mongoose');
+const UserSchema = mongoose.Schema({
+	'name': String,
+	'pass': String
+});
+const User = mongoose.model('User', UserSchema);
+mongoose.connect('mongodb://localhost:27017/asmtfy');
 
 app.use(express.static(__dirname + '/public'));
-io.on('connection', socket => {
-	'use strict';
+app.use(require('body-parser').json());
+app.use(require('cookie-parser')());
+app.route('/')
+.get(function (request, response) {
+	return response.sendFile(__dirname + '/public/html/menu.html');
+})
 
-	const match = `${matches.find(match => Object.keys(io.sockets.adapter.rooms[match].sockets).length < 2) || matches.slice(matches.push(`match_${matches.length}`) - 1).pop()}`;
-
-	const Arena = function (arena) {
-		switch (arena) {
-			case 'teste': 
-				return new Arena({
-					src: '/assets/arenas/teste/'
-				});
-			break;
-			default:
-				this.src = arena.src;
-			break;
+app.route('/login')
+.post(function (request, response) {
+	return User.findOne({
+		'name': request.body.name,
+		'pass': request.body.pass
+	}, 'name pass', function (error, user) {
+		if (error) return console.log(error);
+		if (user && user.name && user.pass) {
+			response.cookie('name', user.name);
+			response.cookie('pass', user.pass);
+			return response.send('true');
 		}
-	};
-
-	socket.join(match);
-	io.to(socket.id).in(match).emit('arena', Arena('teste'));
-
-	console.log(socket.id);
-	console.log(match);
-
-	socket.on('explode', function (center) {
-		io.to(match).emit('explode', center);
+		response.send('false');
 	});
-
-	socket.on('disconnect', () => matches.forEach((element, index) => {
-		if (element === match) return matches.splice(index, 1);
-	}));
 });
 
-http.listen(port, () => console.log(`listening on localhost:${port}`));
+app.route('/signin')
+.post(function (request, response) {
+	User({
+		'name': request.cookies.name,
+		'pass': request.cookies.pass
+	}).save(function (error, user) {
+		if (error) return console.log(error);
+		response.cookie('name', user.name);
+		response.cookie('pass', user.pass);
+		return response.send('true');
+	});
+});
+
+io.on('connection', function (socket) {
+	console.log(`${socket.id} just connected`);
+});
+
+http.listen(port, () => console.log('listening on localhost: ' + port));
+
+//const validate_login = function (request, response, next) {
+//	request.cookies = request.cookies || {};
+//	return User.findOne({
+//		'name': request.cookies.name,
+//		'pass': request.cookies.pass
+//	}, 'name pass', function (error, user) {
+//		if (error) return console.log(error);
+//		if (user && user.name && user.pass) return next();
+//		response.set('Content-Type', 'text/html');
+//		return response.send('<script>window.location.assign("/login")</script>');
+//	});
+//}
+
+//app.route('/')
+//	.get(validate_login, function (request, response) {
+//		return response.sendFile(__dirname + '/public/html/menu.html');
+//	})
+//	.post(function (request, response) {
+//		response.cookie('char', request.body.char);
+//		response.cookie('arena', request.body.arena);
+//		response.set('Content-Type', 'text/html');
+//		return response.send('<script>window.location.assign("/game")</script>');
+//	});
+//app.route('/game')
+//	.get(validate_login, function (request, response) {
+//		return response.sendFile(__dirname + '/public/html/game.html');
+//	});
+//app.route('/cadastro')
+//	.get(function (request, response) {
+//		return response.sendFile(__dirname + '/public/html/cadastro.html');
+//	})
+//	.post(function (request, response) {
+//		return new User({
+//			'name': request.body.name,
+//			'pass': request.body.pass
+//		}).save(function (error, user) {
+//			if (error) return console.log(error);
+//			response.cookie('name', user.name);
+//			response.cookie('pass', user.pass);
+//			response.set('Content-Type', 'text/html');
+//			return response.send('<script>window.location.assign("/")</script>');
+//		});
+//	});
+//app.route('/login')
+//	.get(function (request, response) {
+//		response.sendFile(__dirname + '/public/html/login.html');
+//	})
+//	.post(function (request, response) {
+//		return User.findOne({
+//			'name': request.body.name,
+//			'pass': request.body.pass
+//		}, 'name pass', function (error, user) {
+//			if (error) return console.log(error);
+//			if (user && user.name && user.pass) {
+//				response.cookie('name', user.name);
+//				response.cookie('pass', user.pass);
+//				response.set('Content-Type', 'text/html');
+//				return response.send('<script>window.location.assign("/")</script>');
+//			}
+//			response.set('Content-Type', 'text/html');
+//			return response.send('<script>window.location.assign("/cadastro")</script>');
+//		})
+//	});
+
+//const matches = [];
+//io.on('connection', socket => {
+//	const match = matches.find(function (match) {
+//		return Object.keys(io.sockets.adapter.rooms[match].sockets).length < 2;
+//	}) || matches.slice(matches.push('#' + matches.length + '') - 1).pop();
+//
+//	socket.on('loading', function () {
+//		io.emit('arena', 'teste');
+//	})
+//
+//	socket.on('disconnect', function () {
+//		matches.forEach(function (element, index) {
+//			if (element === match) matches.splice(index, 1);
+//		});
+//	});
+//});
