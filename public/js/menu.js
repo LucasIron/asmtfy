@@ -1,3 +1,5 @@
+'use strict';
+
 $(function () {
 	$('.frame').hide();
 	$('.popup').hide();
@@ -11,7 +13,7 @@ $(function () {
 			});
 		});
 	});
-//	$('.menu').fadeIn();
+	//	$('.menu').fadeIn();
 
 	$('button.options').click(function () {
 		$('.popup.options').stop().fadeIn(250);
@@ -30,7 +32,7 @@ $(function () {
 		$(this).addClass('active').siblings('.btn').removeClass('active');
 		$('html').attr('lang', 'en');
 	});
-	
+
 	if (localStorage.getItem('som') === null) localStorage.setItem('som', true);
 
 	if (localStorage.getItem('som') === 'true') {
@@ -51,11 +53,10 @@ $(function () {
 
 	$('.btn').click(function (event) {
 		if (localStorage.getItem('som') === 'true') audio_btn.play();
-	})
+	});
 
 	$('button.howto').click(function () {
-		$('.popup.howto').stop().fadeIn(250)
-		.find('ul.howto').slick({
+		$('.popup.howto').stop().fadeIn(250).find('ul.howto').slick({
 			'infinite': false,
 			'adaptiveHeight': true
 		});
@@ -68,7 +69,7 @@ $(function () {
 	$('button.credits').click(function () {
 		$('.popup.credits').stop().fadeIn(250);
 	});
-	
+
 	$('.popup.login.signin').find('form').each(function () {
 		$(this).on('submit', function (event) {
 			event.preventDefault();
@@ -79,7 +80,7 @@ $(function () {
 				'data': $(this).serializeArray(),
 				'url': $(this).attr('action'),
 				'method': $(this).attr('method'),
-				'success': function (data) {
+				'success': function success(data) {
 					console.log(data);
 					// if (data == true) {
 					// if (data == true) {
@@ -95,5 +96,5 @@ $(function () {
 
 	$('button.newgame').click(function () {
 		$('.popup.login.signin').stop().fadeIn(250);
-	})
+	});
 });

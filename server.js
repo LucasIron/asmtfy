@@ -22,12 +22,14 @@ app.route('/')
 
 app.route('/login')
 .post(function (request, response) {
+	console.log(request.body);
 	return User.findOne({
 		'name': request.body.name,
 		'pass': request.body.pass
 	}, 'name pass', function (error, user) {
 		if (error) return console.log(error);
 		if (user && user.name && user.pass) {
+			console.log(user);
 			response.cookie('name', user.name);
 			response.cookie('pass', user.pass);
 			return response.send('true');
@@ -38,11 +40,13 @@ app.route('/login')
 
 app.route('/signin')
 .post(function (request, response) {
+	console.log(request.body);
 	User({
-		'name': request.cookies.name,
-		'pass': request.cookies.pass
+		'name': request.body.name,
+		'pass': request.body.pass
 	}).save(function (error, user) {
 		if (error) return console.log(error);
+		console.log(user);
 		response.cookie('name', user.name);
 		response.cookie('pass', user.pass);
 		return response.send('true');
