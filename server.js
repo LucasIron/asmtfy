@@ -14,47 +14,98 @@ mongoose.connect('mongodb://localhost:27017/asmtfy');
 
 app.use(express.static(__dirname + '/public'));
 app.use(require('body-parser').json());
+app.use(require('body-parser').urlencoded({
+	'extended': true
+}));
 app.use(require('cookie-parser')());
 app.route('/')
 .get(function (request, response) {
 	return response.sendFile(__dirname + '/public/html/menu.html');
 })
 
+app.route('/game')
+.get(function (request, response) {
+	User.findOne({
+		'name': request.cookies.name,
+		'pass': request.cookies.pass
+	}, 'name pass', function (error, user) {
+		if (error) return console.log(error);
+		if (!(user && user.name && user.pass)) return response.send('<script>window.location.assign("/")</script>}');
+		return response.sendFile(__dirname + '/public/html/game.html');
+	});
+
+	io.on('connection', function (socket) {
+		var arena;
+		switch (request.cookies.arena) {
+			case 'flat':
+				arena = {
+					'name': 'flat',
+					'layers': 1,
+					'prob': 0,
+					'fx': 0,
+					'fy': 0,
+					'amax': 0,
+					'amin': 0
+				} 
+				break;
+			case 'wall':
+				arena = {
+					'name': 'wall',
+					'layers': 1,
+					'prob': 0,
+					'fx': 0,
+					'fy': 0,
+					'amax': 0,
+					'amin': 0
+				}
+				break;
+		}
+		socket.emit('arena', arena);
+		console.log(`${socket.id} just connected`);
+	});
+});
+
 app.route('/login')
 .post(function (request, response) {
-	console.log(request.body);
 	return User.findOne({
 		'name': request.body.name,
 		'pass': request.body.pass
 	}, 'name pass', function (error, user) {
 		if (error) return console.log(error);
 		if (user && user.name && user.pass) {
-			console.log(user);
 			response.cookie('name', user.name);
 			response.cookie('pass', user.pass);
-			return response.send('true');
+			return response.send('1');
 		}
-		response.send('false');
+		response.cookie('name', undefined);
+		response.cookie('pass', undefined);
+		response.send('0');
 	});
 });
 
 app.route('/signin')
 .post(function (request, response) {
-	console.log(request.body);
-	User({
-		'name': request.body.name,
-		'pass': request.body.pass
-	}).save(function (error, user) {
+	if (User.findOne({
+		'name': request.body.name
+	}, 'name', function (error, user) {
 		if (error) return console.log(error);
-		console.log(user);
-		response.cookie('name', user.name);
-		response.cookie('pass', user.pass);
-		return response.send('true');
-	});
-});
+		if (user && user.name) {
+			response.cookie('name', undefined);
+			response.cookie('pass', undefined);
+			response.send('0');
+			return false;
+		}
 
-io.on('connection', function (socket) {
-	console.log(`${socket.id} just connected`);
+		User({
+			'name': request.body.name,
+			'pass': request.body.pass
+		}).save(function (error, user) {
+			if (error) return console.log(error);
+			response.cookie('name', user.name);
+			response.cookie('pass', user.pass);
+			return response.send('1');
+		});
+	}));
 });
 
 http.listen(port, () => console.log('listening on localhost: ' + port));

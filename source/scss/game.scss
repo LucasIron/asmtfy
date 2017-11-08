@@ -1,10 +1,26 @@
+//@import url('https://fonts.googleapis.com/css?family=VT323');
+
+
 * {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
 }
 
+html:lang(pt-br) {
+	:lang(en) {
+		display: none;
+	}
+}
+
+html:lang(en) {
+	:lang(pt-br) {
+		display: none;
+	}
+}
+
 body {
+	box-sizing: border-box;
 	position: relative;
 	display: flex;
 	flex-wrap: wrap;
@@ -12,33 +28,208 @@ body {
 	align-items: center;
 	background-color: black;
 	min-height: 100vh;
-}
-
-.game {
-	background-color: lightgrey;
+	font-family: 'VT323', monospace;
 }
 
 .asmtfy {
-	&-arena {
-		position: absolute;
-		height: auto;
-		border:  double black 5px;
-	}
+	background-color: lightgrey;
+}
 
-	&-loading_bar {
-		position: absolute;
-		display: flex;
-		justify-content: center;
-		align-items: stretch;
-		align-content: center;
-		border: solid black 2px;
-		border-radius: 5%/50%;
-		overflow: hidden;
-		background-color: black;
+.loading, .waiting, .arena {
+	position: absolute;
+}
 
-		&__inner {
-			height: 100%;
-			background-color: white;
-		}
+.red_points {
+	position: absolute;
+	border-image-slice: 12 13 fill;
+	border-image-width: 24px 26px;
+	border-image-repeat: repeat;
+	border-image-outset: 5px;
+	border-image-source: url(/img/points_frame.png);
+	padding: 15px 30px;
+	font-weight: bold;
+	font-size: 20px;
+	background-color: white;
+	z-index: 3;
+}
+
+.red_team {
+	position: absolute;
+	border-image-slice: 7 6 fill;
+	border-image-width: 12px;
+	border-image-repeat: repeat;
+	border-image-outset: 5px;
+	border-image-source: url(/img/dotted-frame.png);
+	padding: 5px 10px;
+	z-index: 2;
+
+	img {
+		width: 100%;
 	}
+}
+
+.red_points_bar {
+	position: absolute;
+	border-image-slice: 9 20 9 10 fill;
+	border-image-width: 18px 40px 18px 20px;
+	border-image-repeat: repeat;
+	border-image-outset: 14px 18px;
+	border-image-source: url(/img/points_bar.png);
+	background-image: linear-gradient(to bottom, black 0%, rgb(76, 54, 13) 50%, black 100%);
+	height: 10px;
+	z-index: 2;
+}
+
+.red_team_label {
+	position: absolute;
+	background-color: rgb(1, 1, 255);
+	color: white;
+	border-bottom-right-radius: 15px;
+	border: solid black 2px;
+	font-size: 16px;
+	padding: 2.5px 10px 2.5px 25px;
+	text-transform: uppercase;
+	z-index: 1;
+}
+
+.red_points_label {
+	position: absolute;
+	background-color: rgb(70, 35, 0);
+	color: white;
+	border-top-right-radius: 15px;
+	border: solid black 2px;
+	font-size: 16px;
+	padding: 0px 10px 2.5px 25px;
+	text-transform: uppercase;
+	z-index: 1;
+	transform: translateY(-100%);
+}
+
+.yellow_points {
+	position: absolute;
+	border-image-slice: 12 13 fill;
+	border-image-width: 24px 26px;
+	border-image-repeat: repeat;
+	border-image-outset: 5px;
+	border-image-source: url(/img/points_frame.png);
+	padding: 15px 30px;
+	font-weight: bold;
+	font-size: 20px;
+	background-color: white;
+	z-index: 3;
+}
+
+.yellow_team {
+	position: absolute;
+	border-image-slice: 7 6 fill;
+	border-image-width: 12px;
+	border-image-repeat: repeat;
+	border-image-outset: 5px;
+	border-image-source: url(/img/dotted-frame.png);
+	padding: 5px 10px;
+	z-index: 2;
+
+	img {
+		width: 100%;
+	}
+}
+
+.yellow_points_bar {
+	position: absolute;
+	border-image-slice: 9 10 9 20 fill;
+	border-image-width: 18px 20px 18px 40px;
+	border-image-repeat: repeat;
+	border-image-outset: 14px 18px;
+	border-image-source: url(/img/points_bar-i.png);
+	background-image: linear-gradient(to bottom, black 0%, rgb(76, 54, 13) 50%, black 100%);
+	height: 10px;
+	z-index: 2;
+}
+
+.yellow_team_label {
+	position: absolute;
+	background-color: red;
+	color: white;
+	border-bottom-left-radius: 15px;
+	border: solid black 2px;
+	font-size: 16px;
+	padding: 2.5px 25px 2.5px 10px;
+	text-transform: uppercase;
+	z-index: 1;
+}
+
+.yellow_points_label {
+	position: absolute;
+	background-color: rgb(70, 35, 0);
+	color: white;
+	border-top-left-radius: 15px;
+	border: solid black 2px;
+	font-size: 16px;
+	padding: 0px 25px 2.5px 10px;
+	text-transform: uppercase;
+	z-index: 1;
+	transform: translateY(-100%);
+}
+
+.yellow_inner_score_bar {
+	height: 100%;
+	width: 90%;
+	background: linear-gradient(to bottom, black 0%, red 50%, black 100%);
+	position: absolute;
+	z-index: -1;
+	right: 0;
+	border-bottom-left-radius: 15px 100%;
+}
+
+.red_inner_score_bar {
+	height: 100%;
+	width: 90%;
+	background: linear-gradient(to bottom, black 0%, rgb(1, 1, 255) 50%, black 100%);
+	position: absolute;
+	z-index: -1;
+	left: 0;
+	border-bottom-right-radius: 15px 100%;
+}
+
+.char_portrait {
+	position: absolute;
+	border-image-slice: 20 fill;
+	border-image-width: 40px;
+	border-image-repeat: repeat;
+	border-image-outset: 5px;
+	border-image-source: url(/img/portrait_frame.png);
+	padding: 5px;
+	z-index: 2;
+}
+
+.char_skill_1, .char_skill_2, .power_bar {
+	box-sizing: border-box;
+	position: absolute;
+	border-image-slice: 7 fill;
+	border-image-width: 15px;
+	border-image-repeat: repeat;
+	border-image-outset: 10px;
+	border-image-source: url(/img/dotted-frame.png);
+	z-index: 2
+}
+
+.inner_power_bar {
+	width: 70%;
+	height: 100%;
+	position: absolute;
+	left: 0;
+	background-image: linear-gradient(to right, yellow 0%, red 100%);
+}
+
+.power_bar_label {
+	position: absolute;
+	background-color: rgb(70, 35, 0);
+	color: white;
+	border-top-right-radius: 15px;
+	border: solid black 2px;
+	font-size: 16px;
+	padding: 0px 25px 2.5px 10px;
+	text-transform: uppercase;
+	z-index: 1;
+//	transform: translateY(-100%);
 }

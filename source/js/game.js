@@ -2,7 +2,7 @@ $(function () {
 	const canvas = $('.asmtfy').get(0);
 	const ctx = canvas.getContext('2d');
 	$(window).on('resize', function () {
-		$('.game').each(function () {
+		$(canvas).each(function () {
 			$(this).css('height', $(this).width() * (45/100) + 'px');
 			if ($(window).width() * (45/100) < $(window).height()) {
 				$(this).width($(window).width()).height($(window).width() * (45/100));
@@ -16,6 +16,68 @@ $(function () {
 
 
 	const game = new (function () {
+		const socket = io();
+
+		var arena;
+		socket.on('arena', function (molde) {
+			arena = new (function Arena() {
+				const layers = [];
+				for (let i = 0; i < molde.layers; i++) {
+					layers[i] = $('<img>', {
+						'src': '/assets/arenas/' + molde.name + '/' + i + '.png'
+					}).get(0);
+				}
+
+				const ground = $('<img>', {
+					'src': '/assets/arenas/' + molde.name + '/ground.png'
+				}).get(0);
+
+				const wind = {
+					fx: molde.fx,
+					fy: molde.fy,
+					prob: molde.prob,
+					amax: molde.amax,
+					amin: molde.amin
+				};
+
+				const update = function () {
+					return true;
+				};
+	
+				const draw = function () {
+					layers.concat(ground).map(function (layer) {
+						ctx.drawImage(
+							layer,
+							0,
+							-(canvas.width / layer.width * layer.height - canvas.height),
+							canvas.width,
+							canvas.width / layer.width * layer.height
+						);
+					});
+				};
+	
+				const load = function () {
+					var load = true;
+					layers.concat(ground).forEach(function (layer) {
+						if (!layer.width) load = false;
+					});
+					return load;
+				};
+	
+				this.update = function () {
+					update();
+				};
+	
+				this.draw = function () {
+					draw();
+				};
+	
+				this.load = function () {
+					return load();
+				};
+			});
+		});
+
 		var state;
 		this.state = function (estado) {
 			if (estado) {
@@ -26,6 +88,420 @@ $(function () {
 				return state;
 			}
 		}
+
+		state = new (function Load() {
+			const start = function () {
+				$('html').attr('lang', localStorage.getItem('lang'));
+
+				$('body').append(
+					$('<p>', {
+						'class': 'waiting'
+					}).append(
+						$('<span>', {
+							'lang': 'pt-br'
+						}).append('Esperando oponente'),
+	
+						$('<span>', {
+							'lang': 'en'
+						}).append('Waiting opponent'),
+	
+						$('<span>').each(function () {
+							var tick = 0;
+							const span = this;
+							window.setInterval(function () {
+								$(span).text('.'.repeat(++tick % 3 + 1));
+							}, 1000);
+						})
+					).each(function () {
+						const span = this;
+						$(window).resize(function () {
+							$(span).css({
+								'top': $(canvas).offset().top + $(canvas).height() * 0.75 + 'px'
+							});
+						}).resize();
+					}),
+	
+					$('<p>', {
+						'class': 'loading'
+					}).append(
+						$('<span>', {
+							'lang': 'pt-br'
+						}).append('Carregando'),
+	
+						$('<span>', {
+							'lang': 'en'
+						}).append('Loading'),
+	
+						$('<span>').each(function () {
+							var tick = 0;
+							const span = this
+							window.setInterval(function () {
+								$(span).text('.'.repeat(++tick % 3 + 1));
+							}, 1000);
+						})
+					).each(function () {
+						const span = this;
+						$(window).resize(function () {
+							$(span).css({
+								'top': $(canvas).offset().top + $(canvas).height() * 0.85 + 'px'
+							});
+						}).resize();
+					}),
+
+					$('<img>', {
+						'class': 'arena',
+						'src': '/assets/arenas/' + Cookies.get('arena') + '/' + Cookies.get('arena') + '.jpg'
+					}).each(function () {
+						const img = this;
+						$(window).resize(function () {
+							$(img).css({
+								'width': $(canvas).width() * 0.4 + 'px',
+								'top': $(canvas).offset().top + $(canvas).height() * 0.1 + 'px'
+							})
+						}).resize();
+					})
+				);
+
+				
+			}
+			const end = function () {
+				$('.loading, .waiting, .arena').remove();
+			}
+			const update = function () {
+				if (arena && arena.load()) game.state(new function Partida() {
+					const update = function () {
+						arena.update();
+					};
+					const draw = function () {
+						arena.draw();
+					};
+					const start = function () {
+						var red_points;
+						$('body').append(
+							red_points = $('<p>', {
+								'class': 'red_points'
+							}).append(
+								'0000'
+							).each(function () {
+								var points = this;
+								$(window).resize(function () {
+									$(points).css({
+										'top': $(canvas).offset().top + $(canvas).height() * 0.025 + 'px',
+										'left': $(canvas).offset().left + $(canvas).width() * 0.025 + 'px'
+									});
+								}).resize();
+							}).get(0)
+						);
+
+						var red_points_bar;
+						$('body').append(
+							red_points_bar = $('<div>', {
+								'class': 'red_points_bar'
+							}).each(function () {
+								var bar_frame = this;
+								$(window).resize(function () {
+									$(bar_frame).css({
+										'width': $(canvas).width() * 0.35 - $(red_points).outerWidth() + 'px',
+										'left': $(red_points).offset().left + $(red_points).outerWidth() * 1.15 + 'px', 
+										'top': $(red_points).offset().top + $(red_points).outerHeight() * 0.5 + 'px'
+									})
+								}).resize();
+							}).append(
+								$('<div>', {
+									'class': 'red_inner_score_bar'
+								})
+							)
+						);
+
+						$('body').append(
+							$('<div>', {
+								'class': 'red_team'
+							}).append(
+								$('<img>', {
+									src: '/img/mini_portrait_red.png'
+								})
+							).each(function () {
+								var portrait = this;
+								$(window).resize(function () {
+									$(portrait).css({
+										'width': $(red_points).outerWidth() * 0.9 + 'px',
+										'top': $(red_points).offset().top + $(red_points).outerHeight() + 'px',
+										'left': $(red_points).offset().left + $(red_points).width() * 0.1 + 'px'
+									});
+								}).resize();
+							})
+						);
+
+						$('body').append(
+							$('<p>', {
+								'class': 'red_team_label'
+							}).append(
+								$('<span>',{
+									'lang': 'pt-br'
+								}).append('time azul'),
+								
+								$('<span>',{
+									'lang': 'en'
+								}).append('blue team'),
+							).each(function () {
+								var time = this;
+								$(window).resize(function () {
+									$(time).css({
+										'left': $(red_points_bar).offset().left - 30 + 'px',
+										'top': $(red_points_bar).offset().top + $(red_points_bar).outerHeight() + 5 + 'px'
+									})
+								}).resize();
+							})
+						)
+
+						$('body').append(
+							$('<p>', {
+								'class': 'red_points_label'
+							}).append(
+								$('<span>',{
+									'lang': 'pt-br'
+								}).append('pontos'),
+								
+								$('<span>',{
+									'lang': 'en'
+								}).append('score'),
+							).each(function () {
+								var time = this;
+								$(window).resize(function () {
+									$(time).css({
+										'left': $(red_points_bar).offset().left - 30 + 'px',
+										'top': $(red_points_bar).offset().top - $(red_points_bar).outerHeight() + 5 + 'px'
+									})
+								}).resize();
+							})
+						)
+
+						var yellow_points;
+						$('body').append(
+							yellow_points = $('<p>', {
+								'class': 'yellow_points'
+							}).append(
+								'0000'
+							).each(function () {
+								var points = this;
+								$(window).resize(function () {
+									$(points).css({
+										'top': $(canvas).offset().top + $(canvas).height() * 0.025 + 'px',
+										'right': $(canvas).offset().left + $(canvas).width() * 0.025 + 'px'
+									});
+								}).resize();
+							}).get(0)
+						);
+
+						var yellow_points_bar;
+						$('body').append(
+							yellow_points_bar = $('<div>', {
+								'class': 'yellow_points_bar'
+							}).each(function () {
+								var bar_frame = this;
+								$(window).resize(function () {
+									$(bar_frame).css({
+										'width': $(canvas).width() * 0.35 - $(red_points).outerWidth() + 'px',
+										'right': $(red_points).offset().left + $(red_points).outerWidth() * 1.15 + 'px', 
+										'top': $(red_points).offset().top + $(red_points).outerHeight() * 0.5 + 'px'
+									})
+								}).resize();
+							}).append(
+								$('<div>', {
+									'class': 'yellow_inner_score_bar'
+								})
+							)
+						);
+
+						$('body').append(
+							$('<div>', {
+								'class': 'yellow_team'
+							}).append(
+								$('<img>', {
+									src: '/img/mini_portrait_yellow.png'
+								})
+							).each(function () {
+								var portrait = this;
+								$(window).resize(function () {
+									$(portrait).css({
+										'width': $(red_points).outerWidth() * 0.9 + 'px',
+										'top': $(red_points).offset().top + $(red_points).outerHeight() + 'px',
+										'right': $(red_points).offset().left + $(red_points).width() * 0.1 + 'px'
+									});
+								}).resize();
+							})
+						);
+
+						$('body').append(
+							$('<p>', {
+								'class': 'yellow_team_label'
+							}).append(
+								$('<span>',{
+									'lang': 'pt-br'
+								}).append('time vermelho'),
+								
+								$('<span>',{
+									'lang': 'en'
+								}).append('red team'),
+							).each(function () {
+								var time = this;
+								$(window).resize(function () {
+									$(time).css({
+										'right': $(red_points_bar).offset().left - 30 + 'px',
+										'top': $(red_points_bar).offset().top + $(red_points_bar).outerHeight() + 5 + 'px'
+									})
+								}).resize();
+							})
+						)
+
+						$('body').append(
+							$('<p>', {
+								'class': 'yellow_points_label'
+							}).append(
+								$('<span>',{
+									'lang': 'pt-br'
+								}).append('pontos'),
+								
+								$('<span>',{
+									'lang': 'en'
+								}).append('score'),
+							).each(function () {
+								var time = this;
+								$(window).resize(function () {
+									$(time).css({
+										'right': $(red_points_bar).offset().left - 30 + 'px',
+										'top': $(red_points_bar).offset().top - $(red_points_bar).outerHeight() + 5 + 'px'
+									})
+								}).resize();
+							})
+						)
+						
+						var char_portrait;
+						$('body').append(
+							char_portrait = $('<img>', {
+								'src': '/assets/chars/' + Cookies.get('char')  + '/skills/portrait.png',
+								'class': 'char_portrait'
+							}).each(function () {
+								var portrait = this;
+								$(window).resize(function () {
+									$(portrait).css({
+										'width': $(canvas).width() * 0.06 + 'px',
+										'bottom': $(canvas).offset().top + $(canvas).height() * 0.125 + 'px',
+										'left': $(canvas).offset().left + $(canvas).width() * 0.0125 + 'px'
+									});
+								}).resize();
+							})
+						)
+
+						$('body').append(
+							$('<img>', {
+								'src': '/assets/chars/' + Cookies.get('char')  + '/skills/0.png',
+								'class': 'char_skill_1'
+							}).each(function () {
+								var portrait = this;
+								$(window).resize(function () {
+									$(portrait).css({
+										'width': $(canvas).width() * 0.02 + 'px',
+										'bottom': $(canvas).offset().top + $(canvas).height() * 0.060 + 'px',
+										'left': $(canvas).offset().left + $(canvas).width() * 0.017 + 'px'
+									});
+								}).resize();
+							})
+						)
+
+						$('body').append(
+							$('<img>', {
+								'src': '/assets/chars/' + Cookies.get('char')  + '/skills/1.png',
+								'class': 'char_skill_2'
+							}).each(function () {
+								var portrait = this;
+								$(window).resize(function () {
+									$(portrait).css({
+										'width': $(canvas).width() * 0.02 + 'px',
+										'bottom': $(canvas).offset().top + $(canvas).height() * 0.060 + 'px',
+										'left': $(canvas).offset().left + $(canvas).width() * 0.05 + 'px'
+									});
+								}).resize();
+							})
+						)
+
+						$('body').append(
+							$('<div>', {
+								'class': 'power_bar'
+							}).each(function () {
+								var portrait = this;
+								$(window).resize(function () {
+									$(portrait).css({
+										'height': $(canvas).height() * 0.045 + 'px',
+										'width': $(canvas).width() * 0.35 - $(red_points).outerWidth() + 'px',
+										'bottom': $(canvas).offset().top + $(canvas).height() * 0.060 + 'px',
+										'left': $(canvas).offset().left + $(canvas).width() * 0.085 + 'px'
+									});
+								}).resize();
+							}).append(
+								$('<div>', {
+									'class': 'inner_power_bar'
+								})
+							)
+						)
+
+						$('body').append(
+							$('<p>', {
+								'class': 'power_bar_label'
+							}).append(
+								$('<span>',{
+									'lang': 'pt-br'
+								}).append('barra de força'),
+								
+								$('<span>',{
+									'lang': 'en'
+								}).append('power bar'),
+							).each(function () {
+								var time = this;
+								$(window).resize(function () {
+									$(time).css({
+										'top': $(char_portrait).offset().top + $(char_portrait).height() - 10 + 'px',
+										'left': $(char_portrait).offset().left + $(char_portrait).width() + 10 + 'px'
+									})
+								}).resize();
+							})
+						)
+					};
+					const end = function () {
+						return true;
+					};
+
+					this.update = function () {
+						update();
+					}
+					this.draw = function () {
+						draw();
+					}
+					this.start = function () {
+						start();
+					}
+					this.end = function () {
+						end();
+					}
+				}());
+			}
+			const draw = function () {
+//				arena && console.log(arena.load());
+			}
+			this.start = function () {
+				start();
+			}
+			this.update = function () {
+				update();
+			}
+			this.draw = function () {
+				draw();
+			}
+			this.end = function () {
+				end();
+			}
+		})();
+		state.start();
 	})();
 
 	var now;
@@ -38,7 +514,7 @@ $(function () {
 
 		game.state().update();
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		game.state.draw();
+		game.state().draw();
 
 		window.requestAnimationFrame(loop);
 	});

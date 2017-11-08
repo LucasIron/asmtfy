@@ -19,6 +19,8 @@ html:lang(en) {
 }
 
 .frame {
+	position: absolute;
+	top: 0;
 	width: 100%;
 	min-height: 100vh;
 	background-image: url(/img/nuvens.png);
@@ -223,6 +225,94 @@ ul, h1, h2, h3, p {
 	
 		li {
 			margin: 5px;
+		}
+	}
+}
+
+.frame.arenas {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	align-content: space-around;
+
+	.line {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-items: center;
+		align-content: space-around;
+		width: 51%;
+
+		&.caixa {
+			font-size: 16px;
+		}
+
+		.grande {
+			width: 100%;
+			
+			li {
+				cursor: pointer;
+				width: 75%;
+				
+				img {
+					width: 100%;
+				}
+			}
+		}
+		
+		.pequeno {
+			width: 50%;
+			height: 35%;
+			
+			li {
+				cursor: pointer;
+				width: 33%;
+				margin: 0 15px;
+				
+				img {
+					width: 100%;
+				}
+			}
+		}
+	}
+}
+
+.frame.chars {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
+
+	div.line {
+		margin: 15px 0;
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		align-content: center;
+	} 
+
+	ul {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		align-content: center;
+
+		li {
+			margin: 0 15px;
+			cursor: pointer;
+			display: inline;
+
+			input {
+				display: none;
+			}
+
+			input:checked + label img {
+				border: solid red 2px;
+			}
 		}
 	}
 }

@@ -4,12 +4,12 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Arcane School - Home</title>
-		<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick.css"/>
-		<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css"/>
+		<link rel="stylesheet" type="text/css" href="/css/slick.css"/>
+		<link rel="stylesheet" type="text/css" href="/css/slick-theme.css"/>
 		<link rel="stylesheet" type="text/css" href="/css/menu.css">
+		<script type="application/javascript" src="/js/js.cookie.js"></script>
 		<script type="application/javascript" src="/js/jquery.min.js"></script>
-		<script type="text/javascript" src="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick.min.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+		<script type="application/javascript" src="/js/slick.min.js"></script>
 		<script type="application/javascript" src="/js/menu.js"></script>
 	</head>
 	<body>
@@ -88,19 +88,20 @@
 				<div class="line">
 					<ul class="howto">
 						<li>
-							<span lang="pt-br">Informações da equipe: Abaixo dos pontos estão os retratos dos integrantes da sua equipe. Durante a partida, cada acerto vale pontos que são representados por uma barra da cor da sua equipe. Quando essa barra chegar ao máximo, você vence a partida.</span>
-							<span lang="en">Team information: Under the score there are portraits of your teammates. During the match, every hit you earn points with are represented by a bar with your team color. When this bar reaches the maximum, you win the match.</span>
+							<span lang="pt-br">1 - Informações da equipe: Abaixo dos pontos estão os retratos dos integrantes da sua equipe. Durante a partida, cada acerto vale pontos que são representados por uma barra da cor da sua equipe. Quando essa barra chegar ao máximo, você vence a partida.</span>
+							<span lang="en">1 - Team information: Under the score there are portraits of your teammates. During the match, every hit you earn points with are represented by a bar with your team color. When this bar reaches the maximum, you win the match.</span>
 						</li>
 						<li>
-							<span lang="pt-br">Barra de habilidades: O retrato mostra o personagem escolhido pelo jogador. Abaixo do retrado estão as habilidades do personagem. E ao lado, a barra de força, que indica a força de seus disparos.</span>
-							<span lang="en">Ability bar: the portrait shows with character the player choose. Under the portrait, there are the character’s abilities. And next to it, there is a power bar that shows the power of your shoots.</span>
+							<span lang="pt-br">2 - Barra de habilidades: O retrato mostra o personagem escolhido pelo jogador. Abaixo do retrado estão as habilidades do personagem. E ao lado, a barra de força, que indica a força de seus disparos.</span>
+							<span lang="en">2 - Ability bar: the portrait shows with character the player choose. Under the portrait, there are the character’s abilities. And next to it, there is a power bar that shows the power of your shoots.</span>
 						</li>
 						<li>
-							<span lang="pt-br">Vento: Durante a partida o vento pode alterar sua força e velocidade aleatoriamente, podendo influenciar na precisão dos seus disparos. A seta indica a direção do vento e a haste indica a velocidade, quanto maior a haste maior a velocidade.</span>
-							<span lang="en">Wind: During the match the Wind can randomly change its power and speed, may influence the precision of your shoots.</span>
+							<span lang="pt-br">3 - Vento: Durante a partida o vento pode alterar sua força e velocidade aleatoriamente, podendo influenciar na precisão dos seus disparos. A seta indica a direção do vento e a haste indica a velocidade, quanto maior a haste maior a velocidade.</span>
+							<span lang="en">3 - Wind: During the match the Wind can randomly change its power and speed, may influence the precision of your shoots.</span>
 						</li>
 						<li>
 							<div>
+								<p>4 - </p>
 								<p>
 									<span lang="pt-br">W = pulo;</span>
 									<span lang="en">W = jump;</span>
@@ -213,12 +214,36 @@
 		</div>
 
 		<div class="frame arenas">
-			<ul class="grande"></ul>
-			<ul class="pequeno"></ul>
+			<div class="line caixa">
+				<h1>
+					<span lang="pt-br">Selecione a arena!</span>
+					<span lang="en">Choose your arena!</span>
+				</h1>
+			</div>
+			<div class="line">
+				<ul class="grande">
+				</ul>
+				<ul class="pequeno">
+				</ul>
+			</div>
+			<div class="line">
+				<button class="btn next">OK</button>
+			</div>
 		</div>
 
-		<div class="frame char">
-			<ul></ul>
+		<div class="frame chars">
+			<div class="line caixa">
+				<h1>
+					<span lang="pt-br">Selecione o personagem!</span>
+					<span lang="en">Choose your character!</span>
+				</h1>
+			</div>
+			<div class="line">
+				<ul class="chars"></ul>
+			</div>
+			<div class="line">
+				<button class="btn next">play</button>
+			</div>
 		</div>
 	</body>
 </html>
