@@ -61,6 +61,38 @@ app.route('/game')
 				break;
 		}
 		socket.emit('arena', arena);
+		var me;
+		switch (request.cookies.char) {
+			case 'red':
+				me = {
+					x: 0,
+					name: 'red',
+					idle: 6,
+					fall: 1,
+					jump: 1,
+					run: 8,
+					speed: 0.015,
+					charge: 3,
+					attack: 3,
+					tiro: 3
+				}
+			break;
+			case 'yellow':
+				me = {
+					x: 0.8,
+					name: 'yellow',
+					idle: 5,
+					fall: 1,
+					jump: 1,
+					run: 8,
+					speed: 0.04,
+					charge: 4,
+					attack: 3,
+					tiro: 3
+				}
+			break;
+		}
+		socket.emit('me', me);
 		console.log(`${socket.id} just connected`);
 	});
 });

@@ -17,6 +17,485 @@ $(function () {
 
 	const game = new (function () {
 		const socket = io();
+		
+		function Char(molde) {
+			const char  = this;
+			var state;
+			var x = molde.x;
+			var y = 0.3;
+			var path = '/assets/chars/' + molde.name + '/'
+			var fx = 0;
+			var fy = 0;
+			const w = 0.035;
+			this.w = w;
+			var h;
+			var speed = molde.speed;
+			var dir = -1;
+			this.dir = function (rid) {
+				dir = rid;
+			}
+			this.x = function () {return x};
+			this.y = function () {return y};
+			this.h = function () {return h};
+			var tiros = [];
+
+			function Animation(images, length) {
+				length = length * 1000;
+				var zero = Date.now();
+				var atual;
+				this.start = function () {
+					zero = Date.now();
+					atual = 0;
+				}
+				this.update = function () {
+					atual = Math.floor((Date.now() - zero) / (length / images.length));
+					if (atual >= images.length) return false;
+					h = images[atual].height / images[atual].width * (w * canvas.width);
+					return true;
+				}
+				this.draw = function () {
+					ctx.save();
+						ctx.translate(canvas.width * x, canvas.height * y);
+						ctx.scale(dir, 1);
+						ctx.drawImage(images[atual], 0, 0, w * canvas.width * dir, h);
+					ctx.restore();
+				}
+			}
+				var power = 0;
+				var max_power = 3.5;
+				var mouseup;
+			
+			function Tiro () {
+				var tiro = this;
+				var dir = 1;
+				var x = char.x();
+				var y = char.y();
+				var w = char.w * 0.3;
+				var h = 0;
+				var fy = 0;
+				var state;
+
+				function Animation(images, length) {
+					length = length * 1000;
+					var zero = Date.now();
+					var atual;
+					this.start = function () {
+						zero = Date.now();
+						atual = 0;
+					}
+					this.update = function () {
+						atual = Math.floor((Date.now() - zero) / (length / images.length));
+						if (atual >= images.length) return false;
+						h = images[atual].height / images[atual].width * (w * canvas.width);
+						return true;
+					}
+					this.draw = function () {
+						ctx.save();
+							ctx.translate(canvas.width * x, canvas.height * y);
+							ctx.scale(dir, 1);
+							ctx.drawImage(images[atual], 0, 0, w * canvas.width * dir, h);
+						ctx.restore();
+					}
+				}
+				this.state = function (estado) {
+					if (estado) {
+						if (state) state.end();
+						state = estado;
+						state.start();
+					}
+				}
+				this.x = () => x;
+				this.y = () => y;
+				this.h = () => h;
+				this.w = w;
+				var adj = this.x() * canvas.width - mouseup.clientX;
+				console.log(adj);
+				var opo = this.y() * canvas.height - mouseup.clientY;
+				console.log(opo);
+				var ang = Math.atan2(adj, opo);
+//				var hip = Math.sqrt(Math.pow(adj, 2) + Math.pow(opo, 2));
+				var fx = Math.cos(ang) * power;
+				console.log(fx);
+				var fy = Math.sin(1 / ang) * power;
+				console.log(fy);
+				this.update = function () {
+					state.update();
+				}
+				this.draw = function () {
+					state.draw();
+				}
+				var fly = new (function Fly() {
+					var images = [];
+					for (let i = 0; i < molde.tiro; i++) {
+						images[i] = $('<img>', {
+							'src': path + 'tiro/' + i + '.png'
+						}).get(0);
+					}
+					var animation = new Animation(images, 0.5);
+					this.update = function () {
+						if (!animation.update()) {
+							animation.start();
+						}
+
+						fy += arena.g;
+						y += fy * delta;
+						x += fx * delta;
+						if (arena.conflict(tiro)) tiro.state(explosion);
+					}
+
+					this.draw = function () {
+						animation.draw();
+					}
+
+					this.start = function () {
+						animation.start();
+					}
+
+					this.end = function () {
+						
+					}
+				})();
+
+				var explosion = new(function Explosion() {
+					var images = [];
+					for (let i = 0; i < 8; i++) {
+						images[i] = $('<img>', {
+							'src': '/assets/explosion/' + i + '.png'
+						}).get(0);
+					}
+					var animation = new Animation(images, 1);
+					this.update = function () {
+						if (!animation.update()) {
+							arena.destroy(tiro);
+							this.end();
+						}
+					}
+
+					this.draw = function () {
+						animation.draw();
+					}
+
+					this.start = function () {
+						w *= 5;
+						x -= w / 2;
+						y -= w / 2;
+						animation.start();
+					}
+
+					this.end = function () {
+						this.draw = function () {};
+						tiros.shift();
+					}
+				})();
+				this.state(fly);
+			}
+			const attack = new (function Attack() {
+				var images = [];
+				for (let i = 0; i < molde.attack; i++) {
+					images[i] = $('<img>', {
+						'src': path + 'attack/' + i + '.png'
+					}).get(0);
+				}
+				var animation = new Animation(images, 0.5);
+				this.update = function () {
+					if (!animation.update()) {
+						tiros.push(new Tiro());
+						char.state(idle);
+					}
+				}
+				this.draw = function () {
+					animation.draw();
+				}
+				this.start = function () {
+					animation.start();
+				}
+				this.end = function () {
+				}
+			})();
+			const charge = new (function Charge() {
+				var images = [];
+				var sizing = 1;
+				for (let i = 0; i < molde.charge; i++) {
+					images[i] = $('<img>', {
+						'src': path + 'charge/' + i + '.png'
+					}).get(0);
+				}
+				var animation = new Animation(images, 0.5);
+				this.update = function () {
+					if (!animation.update()) animation.start();
+					power += 1.5 * delta * sizing;
+					if (power >= max_power || power <= 0) {
+						sizing *= -1;
+						power += 1.5 * delta * sizing;
+					}
+					$('.inner_power_bar').css({
+						'width': power / max_power * 100 + '%'
+					})
+				}
+				this.draw = function () {
+					animation.draw();
+				}
+				this.start = function () {
+					power = 0;
+					animation.start();
+					$(canvas).mouseup(function (event) {
+						mouseup = event;
+						char.state(attack);
+					});
+				}
+				this.end = function () {
+					$(canvas).off('mouseup');
+				}
+			})();
+			const fall = new (function Fall() {
+				var images = [];
+				for (let i = 0; i < molde.fall; i++) {
+					images[i] = $('<img>', {
+						'src': path + 'fall/' + i + '.png'
+					}).get(0);
+				}
+				var animation = new Animation(images, 1);
+				this.update = function () {
+					if (!animation.update()) animation.start();
+					fy += arena.g;
+					y += fy * delta;
+					x += fx * delta;
+					if (arena.conflict(char)) {
+						while (arena.conflict(char)) {
+							y -= arena.g * 0.1;
+						}
+						 char.state(idle)
+					};
+				}
+				this.draw = function () {
+					animation.draw();
+				}
+				this.start = function () {
+					animation.start();
+				}
+				this.end = function () {
+					
+				}
+			})();
+			const hit = new (function Hit() {
+				this.update = function () {
+					
+				}
+				this.draw = function () {
+					
+				}
+				this.start = function () {
+					
+				}
+				this.end = function () {
+					
+				}
+			})();
+			const jump = new (function Jump() {
+				var images = [];
+				for (let i = 0; i < molde.jump; i++) {
+					images[i] = $('<img>', {
+						'src': path + 'jump/' + i + '.png'
+					}).get(0);
+				}
+				var animation = new Animation(images, 1);
+				this.update = function () {
+					if (!animation.update()) animation.start();
+					fy += arena.g;
+					y += fy * delta;
+					x += fx * delta;
+					if (fy > 0) char.state(fall);
+				}
+				this.draw = function () {
+					animation.draw();
+				}
+				this.start = function () {
+					fy = -0.35;
+					$(window).keyup(function (event) {
+						keys = keys.filter(function (key) {
+							return key !== event.key;
+						});
+					});
+				}
+				this.end = function () {
+					
+				}
+			})();
+			var keys = [];
+			const run = new (function Run() {
+				var dir;
+				var images = [];
+				for (let i = 0; i < molde.run; i++) {
+					images[i] = $('<img>', {
+						'src': path + 'run/' + i + '.png'
+					}).get(0);
+				}
+				var animation = new Animation(images, 1);
+				this.update = function () {
+					if (!animation.update()) animation.start();
+					fy = 0;
+					fx = speed * dir;
+					x += fx * delta;
+				}
+				this.draw = function () {
+					animation.draw();
+				}
+				this.start = function () {
+					animation.start();
+					if (keys[keys.length - 1] === 'd') {
+						dir = 1
+					} else {
+						dir = -1
+					}
+					char.dir(dir);
+					$(window).keydown(function (event) {
+						if (event.key === keys[keys.length - 1]) return;
+						if (event.key === 'w') me.state(jump);
+						if (event.key === 'd' || event.key === 'a') {
+							keys.push(event.key);
+							me.state(run);
+						}
+					});
+					$(window).keyup(function (event) {
+						keys = keys.filter(function (key) {
+							return key !== event.key;
+						})
+						me.state(idle);
+					});
+					$(canvas).mousedown(function (event) {
+						me.state(charge);
+						$(canvas).mousedown();
+					});
+				}
+				this.end = function () {
+					$(window).off('keydown');
+					$(window).off('keyup');
+					$(canvas).off('mousedown');
+				}
+			})();
+			const idle = new (function Idle() {
+				var images = [];
+				for (let i = 0; i < molde.idle; i++) {
+					images[i] = $('<img>', {
+						'src': path + 'idle/' + i + '.png'
+					}).get(0);
+				}
+				var animation = new Animation(images, 1);
+//				var sound = $('<audio>', {
+//					'loop': true,
+//					'preload': 'auto',
+//					'src': 
+//				}).data('load', false).on('canplaythrough', function () {
+//					$(this).data('load', true).get(0);
+//				});
+				this.update = function () {
+					if (!animation.update()) animation.start();
+					fy = 0;
+					fx = 0;
+					fy += arena.g;
+					y += fy;
+					if (arena.conflict(char)) {
+						while (arena.conflict(char)) {
+							y -= arena.g;
+						}
+					} else char.state(fall);
+				}
+				this.draw = function () {
+					animation.draw();
+				}
+				this.start = function () {
+					animation.start();
+					if (keys.length) {
+						if (keys[keys.length - 1] === 'w') me.state(jump);
+						if (keys[keys.length - 1] === 'd' || keys[keys.length - 1] === 'a') {
+							keys.push(keys[keys.length - 1]);
+							me.state(run);
+						}
+					}
+					$(window).keydown(function 	idle(event) {
+						if (event.key === 'w') me.state(jump);
+						if (event.key === 'd' || event.key === 'a') {
+							keys.push(event.key);
+							me.state(run);
+						}
+					})
+					$(canvas).mousedown(function (event) {
+						me.state(charge);
+						$(canvas).mousedown();
+					});
+				}
+				this.end = function () {
+					$(window).off('keydown');
+					$(canvas).off('keyup');
+					$(canvas).off('mousedown');
+				}
+				this.load = function () {
+					return !images.find(function (image) {
+						return !image.width /* && !$(sound).data('load')*/
+					})
+				}
+			})();
+			
+			state = idle;
+			state.start();
+
+			this.name = molde.name;
+			this.update = function () {
+				state.update();
+				tiros.forEach(function (tiro) {
+					tiro.update();
+				});
+				
+			}
+			this.draw = function () {
+				state.draw();
+				tiros.forEach(function (tiro) {
+					tiro.draw();
+				});
+			}
+			this.load = function () {
+				return idle.load();
+			}
+
+			this.state = function (estado) {
+				if (estado) {
+					state.end();
+					state = estado;
+					state.start();
+				}
+			}
+			this.attack = function () {
+				this.state(attack);
+			}
+			this.charge = function () {
+				this.state(charge);
+			}
+			this.idle = function () {
+				this.state(idle);
+			}
+			this.fall = function () {
+				this.state(fall);
+			}
+			this.hit = function () {
+				this.state(hit);
+			}
+			this.jump = function () {
+				this.state(jump);
+			}
+			this.run = function () {
+				this.state(run);
+			}
+		}
+		
+		var me;
+		socket.on('me', function (molde) {
+			me = new Char(molde);
+		});
+		
+		var oponent;
+		socket.on('oponent', function (molde) {
+			oponent = new Char(molde);
+		});
 
 		var arena;
 		socket.on('arena', function (molde) {
@@ -39,6 +518,53 @@ $(function () {
 					amax: molde.amax,
 					amin: molde.amin
 				};
+				
+				const aux = $(canvas).clone().get(0);
+				const aux_ctx = aux.getContext('2d');
+				const pixel_index = (x, y, w) => y * w * 4 + x * 4;
+				this.conflict = function (char) {
+					
+					aux_ctx.drawImage(
+						ground,
+						0,
+						-(canvas.width / ground.width * ground.height - canvas.height),
+						canvas.width,
+						canvas.width / ground.width * ground.height
+					);
+
+					char.x();
+					var collision = false;
+					for (let x = Math.floor(char.x() * canvas.width); x < Math.floor(char.x() * canvas.width + char.w * canvas.width); x++) {
+						for (let y = Math.floor(char.y() * canvas.height + char.h() - 1); y < Math.floor(char.y() * canvas.height + char.h()); y++) {
+							var collider_data = aux_ctx.getImageData(x, y, 1, 1);
+							var data = collider_data.data;
+							if (data[3] > 0) collision = true;
+						}
+					}
+					return collision;
+				}
+				
+				this.g = 0.01;
+				this.destroy = function (tiro) {
+//					console.log(tiro);
+					var r = tiro.w / 2.5 * canvas.width;
+//					return tiro;
+					
+					var x = Math.floor(tiro.x() * canvas.width);
+					var y = Math.floor(tiro.y() * canvas.height);
+					var w = Math.floor(tiro.w * canvas.width);
+					var collider_data = aux_ctx.getImageData(x, y, w, w);
+					for (let i = x; i < x + w; i++) {
+						for (let j = y; j < y + w; j++) {
+//							var distancia = Math.abs(Math.sqrt(Math.pow((x + w / 2 - x), 2) + Math.pow((y + w / 2 - y), 2)));
+//							if (distancia <= r) collider_data.data[pixel_index(i, j, collider_data.width) + 3] = 0;
+							collider_data.data[pixel_index(i, j, collider_data.width) + 3] = 0;
+						}
+					}
+					aux_ctx.putImageData(collider_data, x, y);
+					ground.src = aux.toDataURL();
+//					console.log(ground.src);
+				}
 
 				const update = function () {
 					return true;
@@ -167,13 +693,21 @@ $(function () {
 			const end = function () {
 				$('.loading, .waiting, .arena').remove();
 			}
+			
+			socket.on('found', function (id, char) {
+				socket.emit('found', id, char);
+			})
+			
 			const update = function () {
-				if (arena && arena.load()) game.state(new function Partida() {
+//				if (me) $('.loading').remove();
+				if (arena && me) game.state(new function Partida() {
 					const update = function () {
 						arena.update();
+						me.update();
 					};
 					const draw = function () {
 						arena.draw();
+						me.draw();
 					};
 					const start = function () {
 						var red_points;
@@ -468,7 +1002,7 @@ $(function () {
 						)
 					};
 					const end = function () {
-						return true;
+						$('*').not(canvas).remove();
 					};
 
 					this.update = function () {
@@ -486,7 +1020,7 @@ $(function () {
 				}());
 			}
 			const draw = function () {
-//				arena && console.log(arena.load());
+				return true;
 			}
 			this.start = function () {
 				start();
@@ -509,7 +1043,7 @@ $(function () {
 	var before;
 	window.requestAnimationFrame(function loop() {
 		now = Date.now();
-		delta = now - before;
+		delta = (now - before) / 1000;
 		before = now;
 
 		game.state().update();
