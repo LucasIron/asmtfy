@@ -94,6 +94,13 @@ app.route('/game')
 		}
 		socket.emit('me', me);
 		console.log(`${socket.id} just connected`);
+
+		socket.on('disconnect', function () {
+			console.log(`${socket.id} just disconnected`);
+//			matches.forEach(function (element, index) {
+//				if (element === match) matches.splice(index, 1);
+//			});
+		});
 	});
 });
 

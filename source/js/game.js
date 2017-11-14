@@ -15,14 +15,14 @@ $(function () {
 	}).resize();
 
 
+	const socket = io();
 	const game = new (function () {
-		const socket = io();
 		
 		function Char(molde) {
 			const char  = this;
 			var state;
 			var x = molde.x;
-			var y = 0.3;
+			var y = 0;
 			var path = '/assets/chars/' + molde.name + '/'
 			var fx = 0;
 			var fy = 0;
@@ -62,14 +62,14 @@ $(function () {
 				}
 			}
 				var power = 0;
-				var max_power = 3.5;
+				var max_power = 1;
 				var mouseup;
 			
 			function Tiro () {
 				var tiro = this;
 				var dir = 1;
-				var x = char.x();
-				var y = char.y();
+				var x = char.x() + char.w / 2;
+				var y = char.y() + char.w;
 				var w = char.w * 0.3;
 				var h = 0;
 				var fy = 0;
@@ -108,16 +108,11 @@ $(function () {
 				this.y = () => y;
 				this.h = () => h;
 				this.w = w;
-				var adj = this.x() * canvas.width - mouseup.clientX;
-				console.log(adj);
-				var opo = this.y() * canvas.height - mouseup.clientY;
-				console.log(opo);
-				var ang = Math.atan2(adj, opo);
-//				var hip = Math.sqrt(Math.pow(adj, 2) + Math.pow(opo, 2));
-				var fx = Math.cos(ang) * power;
-				console.log(fx);
-				var fy = Math.sin(1 / ang) * power;
-				console.log(fy);
+				var adj = x * canvas.width - mouseup.clientX + $(canvas).offset().left;
+				var opo = y * canvas.height - mouseup.clientY + $(canvas).offset().top;
+				var ang = Math.atan2(opo, adj);
+				var fx = -Math.cos(ang) * power;
+				var fy = -Math.sin(ang) * power;
 				this.update = function () {
 					state.update();
 				}
@@ -165,14 +160,15 @@ $(function () {
 					}
 					var animation = new Animation(images, 1);
 					this.update = function () {
-						if (!animation.update()) {
+						if (arena.conflict) {
 							arena.destroy(tiro);
 							this.end();
 						}
 					}
 
 					this.draw = function () {
-						animation.draw();
+						if (animation.update()) return animation.draw();
+						tiros.shift();
 					}
 
 					this.start = function () {
@@ -183,8 +179,8 @@ $(function () {
 					}
 
 					this.end = function () {
-						this.draw = function () {};
-						tiros.shift();
+//						this.draw = function () {};
+//						tiros.shift();
 					}
 				})();
 				this.state(fly);
@@ -336,6 +332,13 @@ $(function () {
 					fy = 0;
 					fx = speed * dir;
 					x += fx * delta;
+					fy += arena.g;
+					y += fy;
+					if (arena.conflict(char)) {
+						while (arena.conflict(char)) {
+							y -= arena.g;
+						}
+					} else char.state(fall);
 				}
 				this.draw = function () {
 					animation.draw();
@@ -363,6 +366,7 @@ $(function () {
 						me.state(idle);
 					});
 					$(canvas).mousedown(function (event) {
+						keys.pop();
 						me.state(charge);
 						$(canvas).mousedown();
 					});
@@ -519,11 +523,12 @@ $(function () {
 					amin: molde.amin
 				};
 				
-				const aux = $(canvas).clone().get(0);
+				const aux = $(canvas).clone().removeClass('asmtfy').addClass('aux').get(0);
+//				$('body').append(aux);
 				const aux_ctx = aux.getContext('2d');
-				const pixel_index = (x, y, w) => y * w * 4 + x * 4;
+//				$('body').append(aux);
+				const pixel_index = (x, y, w) => Math.floor(y * w * 4 + x * 4);
 				this.conflict = function (char) {
-					
 					aux_ctx.drawImage(
 						ground,
 						0,
@@ -546,24 +551,22 @@ $(function () {
 				
 				this.g = 0.01;
 				this.destroy = function (tiro) {
-//					console.log(tiro);
-					var r = tiro.w / 2.5 * canvas.width;
-//					return tiro;
-					
-					var x = Math.floor(tiro.x() * canvas.width);
-					var y = Math.floor(tiro.y() * canvas.height);
-					var w = Math.floor(tiro.w * canvas.width);
-					var collider_data = aux_ctx.getImageData(x, y, w, w);
+					var x = tiro.x() * canvas.width;
+					var y = tiro.y() * canvas.height;
+					var w = tiro.w * canvas.width;
+					var r = w / 2;
+					var collider_data = aux_ctx.getImageData(x, y, x + w, y + w);
+					var data = collider_data.data;
 					for (let i = x; i < x + w; i++) {
 						for (let j = y; j < y + w; j++) {
-//							var distancia = Math.abs(Math.sqrt(Math.pow((x + w / 2 - x), 2) + Math.pow((y + w / 2 - y), 2)));
-//							if (distancia <= r) collider_data.data[pixel_index(i, j, collider_data.width) + 3] = 0;
-							collider_data.data[pixel_index(i, j, collider_data.width) + 3] = 0;
+//							var distancia = Math.sqrt(Math.cos(Math.atan2(j - y, i - x)) + Math.sin(Math.atan2(j - y, i - x)));
+//							if (distancia > r) data[pixel_index(i, j, collider_data.width) + 3] = 0;
+//							data[pixel_index(i, j, collider_data.width) + 3] = 0
 						}
 					}
-					aux_ctx.putImageData(collider_data, x, y);
+					aux_ctx.clearRect(0, 0, aux.width, aux.height);
+					aux_ctx.putImageData(collider_data, 0, 0, x, y, w, w);
 					ground.src = aux.toDataURL();
-//					console.log(ground.src);
 				}
 
 				const update = function () {

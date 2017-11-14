@@ -59,6 +59,7 @@ typings/
 
 #mongodb data
 data/
+db/
 
-#final code
 public/
+#final code
