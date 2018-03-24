@@ -33,9 +33,14 @@ app.route('/game')
 		if (!(user && user.name && user.pass)) return response.send('<script>window.location.assign("/")</script>}');
 		return response.sendFile(__dirname + '/public/html/game.html');
 	});
+});
 
-	io.on('connection', function (socket) {
-		var arena;
+io.on('connection', function (socket) {
+	var arena;
+	socket.on('cookies', function(cookies){
+		var request = {};
+		request.cookies = cookies
+	
 		switch (request.cookies.arena) {
 			case 'flat':
 				arena = {
@@ -93,14 +98,15 @@ app.route('/game')
 			break;
 		}
 		socket.emit('me', me);
-		console.log(`${socket.id} just connected`);
+	});
 
-		socket.on('disconnect', function () {
-			console.log(`${socket.id} just disconnected`);
+	console.log(`${socket.id} just connected`);
+
+	socket.on('disconnect', function () {
+		console.log(`${socket.id} just disconnected`);
 //			matches.forEach(function (element, index) {
 //				if (element === match) matches.splice(index, 1);
 //			});
-		});
 	});
 });
 
