@@ -71,12 +71,13 @@ io.on('connection', function (socket) {
 			case 'red':
 				me = {
 					x: 0,
+					w: 0.035,
 					name: 'red',
 					idle: 6,
 					fall: 1,
 					jump: 1,
 					run: 8,
-					speed: 0.015,
+					speed: 0.04,
 					charge: 3,
 					attack: 3,
 					tiro: 3
@@ -85,6 +86,7 @@ io.on('connection', function (socket) {
 			case 'yellow':
 				me = {
 					x: 0.8,
+					w: 0.025,
 					name: 'yellow',
 					idle: 5,
 					fall: 1,

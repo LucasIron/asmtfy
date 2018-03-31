@@ -1,6 +1,5 @@
 
-// tiro e buraco da explosao, estao erradas. as posiçoes nao batem
-//a explosao começa no lugar eerrado
+
 
 $(function () {
 	const canvas = $('.asmtfy').get(0);
@@ -27,10 +26,11 @@ $(function () {
 			var state;
 			var x = molde.x;
 			var y = 0;
+			var name = molde.name;
 			var path = '/assets/chars/' + molde.name + '/'
 			var fx = 0;
 			var fy = 0;
-			const w = 0.035;
+			const w = molde.w;//0.035
 			this.w = w;
 			var h;
 			var speed = molde.speed;
@@ -164,31 +164,159 @@ $(function () {
 					}
 					var animation = new Animation(images, 1);
 					this.update = function () {
-						if (arena.conflict) {
-							arena.destroy(tiro);
-							this.end();
-						}
+					//		arena.destroy(tiro);
 					}
 
 					this.draw = function () {
 						if (animation.update()) return animation.draw();
-						tiros.shift();
+						this.end();
 					}
-//arrumar aqui
+
 					this.start = function () {
 						w *= 5;
+						tiro.w = w;
 						x -= w / 2;
 						y -= w / 2;
 						animation.start();
+						//console.log('w do char', char.w);
+						//console.log('x y w do tiro', tiro.x(), tiro.y(), tiro.w);
+						arena.destroy(tiro);
 					}
 
 					this.end = function () {
-//						this.draw = function () {};
-//						tiros.shift();
+						tiros.shift();//deveria tirar a si proprio
 					}
 				})();
 				this.state(fly);
 			}
+			
+			function Tiro2 (x, y, w) {
+				var tiro = this;
+				var dir = 1;
+				//var x = char.x() + char.w / 2;
+				//var y = char.y() + char.w;
+				//var w = char.w * 0.3;
+				//if (char.name == 'red') w = char.w * 0.45;
+				var h = 0;
+				var fy = 0;
+				var state;
+
+				function Animation(images, length) {
+					length = length * 1000;
+					var zero = Date.now();
+					var atual;
+					this.start = function () {
+						zero = Date.now();
+						atual = 0;
+					}
+					this.update = function () {
+						atual = Math.floor((Date.now() - zero) / (length / images.length));
+						if (atual >= images.length) return false;
+						h = images[atual].height / images[atual].width * (w * canvas.width);
+						return true;
+					}
+					this.draw = function () {
+						ctx.save();
+							ctx.translate(canvas.width * x, canvas.height * y);
+							ctx.scale(dir, 1);
+							ctx.drawImage(images[atual], 0, 0, w * canvas.width * dir, h);
+						ctx.restore();
+					}
+				}
+				this.state = function (estado) {
+					if (estado) {
+						if (state) state.end();
+						state = estado;
+						state.start();
+					}
+				}
+				this.x = () => x;
+				this.y = () => y;
+				this.h = () => h;
+				this.w = w;
+				var adj = x * canvas.width - mouseup.clientX + $(canvas).offset().left;
+				var opo = y * canvas.height - mouseup.clientY + $(canvas).offset().top;
+				var ang = Math.atan2(opo, adj);
+				var fx = -Math.cos(ang) * power;
+				var fy = -Math.sin(ang) * power;
+				var caindo = false;
+				this.update = function () {
+					state.update();
+				}
+				this.draw = function () {
+					state.draw();
+				}
+				var fly = new (function Fly() {
+					var images = [];
+					for (let i = 0; i < molde.tiro; i++) {
+						images[i] = $('<img>', {
+							'src': path + 'tiro/' + i + '.png'
+						}).get(0);
+					}
+					var animation = new Animation(images, 0.5);
+					this.update = function () {
+						if (!animation.update()) {
+							animation.start();
+						}
+
+						fy += arena.g;
+						y += fy * delta;
+						x += fx * delta;
+						//ARRUMAR AQUI!!!!! TO FULO!
+						if (char.name == 'yellow' && caindo == false & fy > 0) {
+							caindo = true;
+							tiros.push(new Tiro2(tiro.x(), tiro.y() - tiro.w * 2, tiro.w));
+							tiros.push(new Tiro2(tiro.x(), tiro.y() + tiro.w * 2, tiro.w));
+						}
+						if (arena.conflict(tiro)) tiro.state(explosion);
+					}
+
+					this.draw = function () {
+						animation.draw();
+					}
+
+					this.start = function () {
+						animation.start();
+					}
+
+					this.end = function () {
+						
+					}
+				})();
+
+				var explosion = new(function Explosion() {
+					var images = [];
+					for (let i = 0; i < 8; i++) {
+						images[i] = $('<img>', {
+							'src': '/assets/explosion/' + i + '.png'
+						}).get(0);
+					}
+					var animation = new Animation(images, 1);
+					this.update = function () {
+					//		arena.destroy(tiro);
+					}
+
+					this.draw = function () {
+						if (animation.update()) return animation.draw();
+						this.end();
+					}
+
+					this.start = function () {
+						w *= 5;
+						tiro.w = w;
+						x -= w / 2;
+						y -= w / 2;
+						animation.start();
+						arena.destroy(tiro);
+					}
+
+					this.end = function () {
+						tiros.shift();//deveria tirar a si proprio
+					}
+				})();
+				this.state(fly);
+			}
+			
 			const attack = new (function Attack() {
 				var images = [];
 				for (let i = 0; i < molde.attack; i++) {
@@ -200,6 +328,33 @@ $(function () {
 				this.update = function () {
 					if (!animation.update()) {
 						tiros.push(new Tiro());
+						char.state(idle);
+					}
+				}
+				this.draw = function () {
+					animation.draw();
+				}
+				this.start = function () {
+					animation.start();
+				}
+				this.end = function () {
+				}
+			})();
+			const attack2 = new (function Attack2() {
+				var images = [];
+				for (let i = 0; i < molde.attack2; i++) {
+					images[i] = $('<img>', {
+						'src': path + 'attack/' + i + '.png'
+					}).get(0);
+				}
+				var animation = new Animation(images, 0.5);
+				this.update = function () {
+					if (!animation.update()) {
+						var x = char.x() + char.w / 2;
+						var y = char.y() + char.w;
+						var w = char.w * 0.3;
+						if (char.name == 'red') w = char.w * 0.45
+						tiros.push(new Tiro2(x, y, w));
 						char.state(idle);
 					}
 				}
@@ -240,7 +395,15 @@ $(function () {
 					animation.start();
 					$(canvas).mouseup(function (event) {
 						mouseup = event;
-						char.state(attack);
+						if (event.button == 0){
+							char.state(attack);
+						}else if (event.button == 2){
+							char.state(attack2);
+						}
+					});
+					
+					$(canvas).on('contextmenu', function (event) {
+						event.preventDefault();
 					});
 				}
 				this.end = function () {
@@ -495,6 +658,7 @@ $(function () {
 			}
 		}
 		
+//variaveis q ele carrega quando faz a conexao
 		var me;
 		socket.on('me', function (molde) {
 			me = new Char(molde);
@@ -504,7 +668,8 @@ $(function () {
 		socket.on('oponent', function (molde) {
 			oponent = new Char(molde);
 		});
-
+		
+		//propriedades da arena
 		var arena;
 		socket.on('arena', function (molde) {
 			arena = new (function Arena() {
@@ -523,14 +688,14 @@ $(function () {
 					fx: molde.fx,
 					fy: molde.fy,
 					prob: molde.prob,
-					amax: molde.amax,
+					amax: molde.amax, //aceleração max e min
 					amin: molde.amin
 				};
 				
 				const aux = $(canvas).clone().removeClass('asmtfy').addClass('aux').get(0);
-//				$('body').append(aux);
+				//$('body').append(aux);
 				const aux_ctx = aux.getContext('2d');
-//				$('body').append(aux);
+				//$('body').append(aux);
 				//$(aux).appendTo('body');
 				const pixel_index = (x, y, w) => Math.floor(y * w * 4 + x * 4);
 				this.conflict = function (char) {
@@ -557,21 +722,21 @@ $(function () {
 				this.g = 0.01;
 				this.destroy = function (tiro) {
 					
-/* o erro esta aqui	, talvez	*/			
-
 					var x = tiro.x() * canvas.width;
 					var y = tiro.y() * canvas.height;
 					var w = tiro.w * canvas.width;
-					//var r = w / 2;
-					var r = 30;
+					var r = w / 2;
+					//var r = 30;
 					
-					console.log(tiro.x(),tiro.y(),tiro.w);
+					//console.log(x,y,w,r);
+					//console.log('x y w do tiro do arena destry', tiro.x(), tiro.y(), tiro.w);
 					
 					var collider_data = aux_ctx.getImageData(0, 0, canvas.width, canvas.height);
 		
+					// otimizar essa função
 					for (let i = 0; i < canvas.width; i++) {
 						for (let j = 0; j < canvas.height; j++) {
-							var distancia = Math.sqrt((Math.abs(x - i)**2) + (Math.abs(y - j)**2));
+							var distancia = Math.sqrt((Math.abs((x + (w / 2)) - i)**2) + (Math.abs((y + (w / 2)) - j)**2));
 							if (distancia < r) collider_data.data[pixel_index(i, j, collider_data.width) + 3] = 0;
 							//collider_data.data[pixel_index(i, j, collider_data.width) + 3] = 0
 						}
@@ -631,19 +796,17 @@ $(function () {
 		});
 
 		
-		//alteramos aqui
-		socket.on('connect', function()
-		{
+		//alteramos aqui, para resolver o ploblema da conexão multipla
+		socket.on('connect', function() {
 			var cookies = {
 				'arena': Cookies.get('arena'),
 				'char': Cookies.get('char')
 			}
-			
 			socket.emit('cookies', cookies);
 		});
 		
 		
-		//inicio dos estados..
+		//inicio dos estados...
 		var state;
 		this.state = function (estado) {
 			if (estado) {
@@ -738,6 +901,7 @@ $(function () {
 				socket.emit('found', id, char);
 			})
 			
+//propriedades e alterações da HUD			
 			const update = function () {
 //				if (me) $('.loading').remove();
 				if (arena && me) game.state(new function Partida() {
