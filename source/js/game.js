@@ -17,7 +17,7 @@ $(function () {
 		});
 	}).resize();
 
-
+	var IntervalDosPontinhos;
 	const socket = io();
 	const game = new (function () {
 		
@@ -69,12 +69,9 @@ $(function () {
 				var max_power = 1;
 				var mouseup;
 			
-			function Tiro () {
+			function Tiro (x, y, w) {
 				var tiro = this;
 				var dir = 1;
-				var x = char.x() + char.w / 2;
-				var y = char.y() + char.w;
-				var w = char.w * 0.3;
 				var h = 0;
 				var fy = 0;
 				var state;
@@ -115,8 +112,8 @@ $(function () {
 				var adj = x * canvas.width - mouseup.clientX + $(canvas).offset().left;
 				var opo = y * canvas.height - mouseup.clientY + $(canvas).offset().top;
 				var ang = Math.atan2(opo, adj);
-				var fx = -Math.cos(ang) * power;
-				var fy = -Math.sin(ang) * power;
+				var fx = -Math.cos(ang) * power * 0.5;
+				var fy = -Math.sin(ang) * power * 0.5;
 				this.update = function () {
 					state.update();
 				}
@@ -193,10 +190,6 @@ $(function () {
 			function Tiro2 (x, y, w) {
 				var tiro = this;
 				var dir = 1;
-				//var x = char.x() + char.w / 2;
-				//var y = char.y() + char.w;
-				//var w = char.w * 0.3;
-				//if (char.name == 'red') w = char.w * 0.45;
 				var h = 0;
 				var fy = 0;
 				var state;
@@ -237,8 +230,8 @@ $(function () {
 				var adj = x * canvas.width - mouseup.clientX + $(canvas).offset().left;
 				var opo = y * canvas.height - mouseup.clientY + $(canvas).offset().top;
 				var ang = Math.atan2(opo, adj);
-				var fx = -Math.cos(ang) * power;
-				var fy = -Math.sin(ang) * power;
+				var fx = -Math.cos(ang) * power * 0.5;
+				var fy = -Math.sin(ang) * power * 0.5;
 				var caindo = false;
 				this.update = function () {
 					state.update();
@@ -262,12 +255,14 @@ $(function () {
 						fy += arena.g;
 						y += fy * delta;
 						x += fx * delta;
-						//ARRUMAR AQUI!!!!! TO FULO!
+					
 						if (char.name == 'yellow' && caindo == false & fy > 0) {
 							caindo = true;
-							tiros.push(new Tiro2(tiro.x(), tiro.y() - tiro.w * 2, tiro.w));
-							tiros.push(new Tiro2(tiro.x(), tiro.y() + tiro.w * 2, tiro.w));
+							tiros.push(new Tiro3(tiro.x(), tiro.y(), tiro.w, fx * 1.1, fy));
+							tiros.push(new Tiro3(tiro.x(), tiro.y(), tiro.w, fx * 0.9, fy));	
+						
 						}
+						
 						if (arena.conflict(tiro)) tiro.state(explosion);
 					}
 
@@ -316,7 +311,124 @@ $(function () {
 				})();
 				this.state(fly);
 			}
+
+			//tiro3 é um tiro auxiliar do tiro 1
+			function Tiro3 (x, y, w, fx, fy) {
+				var tiro = this;
+				var dir = 1;
+				var h = 0;
+				var fy = 0;
+				var state;
+
+				function Animation(images, length) {
+					length = length * 1000;
+					var zero = Date.now();
+					var atual;
+					this.start = function () {
+						zero = Date.now();
+						atual = 0;
+					}
+					this.update = function () {
+						atual = Math.floor((Date.now() - zero) / (length / images.length));
+						if (atual >= images.length) return false;
+						h = images[atual].height / images[atual].width * (w * canvas.width);
+						return true;
+					}
+					this.draw = function () {
+						ctx.save();
+							ctx.translate(canvas.width * x, canvas.height * y);
+							ctx.scale(dir, 1);
+							ctx.drawImage(images[atual], 0, 0, w * canvas.width * dir, h);
+						ctx.restore();
+					}
+				}
+				this.state = function (estado) {
+					if (estado) {
+						if (state) state.end();
+						state = estado;
+						state.start();
+					}
+				}
+				
+				this.x = () => x;
+				this.y = () => y;
+				this.h = () => h;
+				this.w = w;
+				this.update = function () {
+					state.update();
+				}
+				this.draw = function () {
+					state.draw();
+				}
+				var fly = new (function Fly() {
+					var images = [];
+					for (let i = 0; i < molde.tiro; i++) {
+						images[i] = $('<img>', {
+							'src': path + 'tiro/' + i + '.png'
+						}).get(0);
+					}
+					var animation = new Animation(images, 0.5);
+					this.update = function () {
+						if (!animation.update()) {
+							animation.start();
+						}
+
+						fy += arena.g;
+						y += fy * delta;
+						x += fx * delta;
+						if (arena.conflict(tiro)) tiro.state(explosion);
+					}
+
+					this.draw = function () {
+						animation.draw();
+					}
+
+					this.start = function () {
+						animation.start();
+					}
+
+					this.end = function () {
+						
+					}
+				})();
+
+				var explosion = new(function Explosion() {
+					var images = [];
+					for (let i = 0; i < 8; i++) {
+						images[i] = $('<img>', {
+							'src': '/assets/explosion/' + i + '.png'
+						}).get(0);
+					}
+					var animation = new Animation(images, 1);
+					this.update = function () {
+					//		arena.destroy(tiro);
+					}
+
+					this.draw = function () {
+						if (animation.update()) return animation.draw();
+						this.end();
+					}
+
+					this.start = function () {
+						w *= 5;
+						tiro.w = w;
+						x -= w / 2;
+						y -= w / 2;
+						animation.start();
+						//console.log('w do char', char.w);
+						//console.log('x y w do tiro', tiro.x(), tiro.y(), tiro.w);
+						arena.destroy(tiro);
+					}
+
+					this.end = function () {
+						tiros.shift();//deveria tirar a si proprio
+					}
+				})();
+				this.state(fly);
+			}			
+
 			
+//-------------------estados do personagen-------------------------------------------------------------------------------			
 			const attack = new (function Attack() {
 				var images = [];
 				for (let i = 0; i < molde.attack; i++) {
@@ -327,7 +439,7 @@ $(function () {
 				var animation = new Animation(images, 0.5);
 				this.update = function () {
 					if (!animation.update()) {
-						tiros.push(new Tiro());
+						tiros.push(new Tiro(char.x() + char.w / 2, char.y() + char.w, char.w * 0.3));
 						char.state(idle);
 					}
 				}
@@ -340,6 +452,8 @@ $(function () {
 				this.end = function () {
 				}
 			})();
+			
+			//ataque especial do red
 			const attack2 = new (function Attack2() {
 				var images = [];
 				for (let i = 0; i < molde.attack2; i++) {
@@ -378,7 +492,7 @@ $(function () {
 				var animation = new Animation(images, 0.5);
 				this.update = function () {
 					if (!animation.update()) animation.start();
-					power += 1.5 * delta * sizing;
+					power += 0.75 * delta * sizing;
 					if (power >= max_power || power <= 0) {
 						sizing *= -1;
 						power += 1.5 * delta * sizing;
@@ -424,21 +538,35 @@ $(function () {
 					y += fy * delta;
 					x += fx * delta;
 					if (arena.conflict(char)) {
+						var yInicial = y;
 						while (arena.conflict(char)) {
-							y -= arena.g * 0.1;
+							y -= arena.g;
+							var yFim = y;
+							if (yInicial - yFim > 0.05) {
+								x -= fx * delta;
+								y = yInicial;
+								while (arena.conflict(char)) {
+									y -= arena.g;
+								}
+							}
 						}
-						 char.state(idle)
-					};
-				}
+						char.state(idle);
+					}
+				};
 				this.draw = function () {
 					animation.draw();
-				}
+				};
 				this.start = function () {
+					$(window).keyup(function (event) {
+						keys = keys.filter(function (key) {
+							return key !== event.key;
+						});
+					});
 					animation.start();
-				}
+				};
 				this.end = function () {
-					
-				}
+					$(window).off('keyup');
+				};
 			})();
 			const hit = new (function Hit() {
 				this.update = function () {
@@ -467,6 +595,20 @@ $(function () {
 					fy += arena.g;
 					y += fy * delta;
 					x += fx * delta;
+					if (arena.conflict(char)) {
+						var yInicial = y;
+						while (arena.conflict(char)) {
+							y -= arena.g;
+							var yFim = y;
+							if (yInicial - yFim > 0.05) {
+								x -= fx * delta;
+								y = yInicial;
+								while (arena.conflict(char)) {
+									y -= arena.g;
+								}
+							}
+						}
+					}
 					if (fy > 0) char.state(fall);
 				}
 				this.draw = function () {
@@ -485,6 +627,7 @@ $(function () {
 				}
 			})();
 			var keys = [];
+			
 			const run = new (function Run() {
 				var dir;
 				var images = [];
@@ -502,8 +645,17 @@ $(function () {
 					fy += arena.g;
 					y += fy;
 					if (arena.conflict(char)) {
+						var yInicial = y;
 						while (arena.conflict(char)) {
 							y -= arena.g;
+							var yFim = y;
+							if (yInicial - yFim > 0.05) {
+								x -= fx * delta;
+								y = yInicial;
+								while (arena.conflict(char)) {
+									y -= arena.g;
+								}
+							}
 						}
 					} else char.state(fall);
 				}
@@ -566,8 +718,17 @@ $(function () {
 					fy += arena.g;
 					y += fy;
 					if (arena.conflict(char)) {
+						var yInicial = y;
 						while (arena.conflict(char)) {
 							y -= arena.g;
+							var yFim = y;
+							if (yInicial - yFim > 0.05) {
+								x -= fx * delta;
+								y = yInicial;
+								while (arena.conflict(char)) {
+									y -= arena.g;
+								}
+							}
 						}
 					} else char.state(fall);
 				}
@@ -657,7 +818,8 @@ $(function () {
 				this.state(run);
 			}
 		}
-		
+//-- fim dos estados dos personagens-------------------------------------------------------------------------------
+
 //variaveis q ele carrega quando faz a conexao
 		var me;
 		socket.on('me', function (molde) {
@@ -669,7 +831,7 @@ $(function () {
 			oponent = new Char(molde);
 		});
 		
-		//propriedades da arena
+//propriedades da arena -------------------------------------------------------------------------------------------------------------------------
 		var arena;
 		socket.on('arena', function (molde) {
 			arena = new (function Arena() {
@@ -693,10 +855,7 @@ $(function () {
 				};
 				
 				const aux = $(canvas).clone().removeClass('asmtfy').addClass('aux').get(0);
-				//$('body').append(aux);
 				const aux_ctx = aux.getContext('2d');
-				//$('body').append(aux);
-				//$(aux).appendTo('body');
 				const pixel_index = (x, y, w) => Math.floor(y * w * 4 + x * 4);
 				this.conflict = function (char) {
 					aux_ctx.drawImage(
@@ -721,15 +880,10 @@ $(function () {
 				
 				this.g = 0.01;
 				this.destroy = function (tiro) {
-					
 					var x = tiro.x() * canvas.width;
 					var y = tiro.y() * canvas.height;
 					var w = tiro.w * canvas.width;
 					var r = w / 2;
-					//var r = 30;
-					
-					//console.log(x,y,w,r);
-					//console.log('x y w do tiro do arena destry', tiro.x(), tiro.y(), tiro.w);
 					
 					var collider_data = aux_ctx.getImageData(0, 0, canvas.width, canvas.height);
 		
@@ -741,18 +895,7 @@ $(function () {
 							//collider_data.data[pixel_index(i, j, collider_data.width) + 3] = 0
 						}
 					}
-					/*
-					for(var i=canvas.width - 10; i <canvas.width; i++){
-						for(var j=canvas.height - 10; j <canvas.height; j++){
-							collider_data.data[pixel_index(i, j, collider_data.width) + 3] = 0;
-						}
-					}*/
-					
-				
-					
-				
-					aux_ctx.clearRect(0, 0, aux.width, aux.height);								
-					//aux_ctx.putImageData(collider_data, 0, 0, x, y, w, w);
+					aux_ctx.clearRect(0, 0, aux.width, aux.height);
 					aux_ctx.putImageData(collider_data, 0, 0);
 					ground.src = aux.toDataURL();
 				}
@@ -837,7 +980,7 @@ $(function () {
 						$('<span>').each(function () {
 							var tick = 0;
 							const span = this;
-							window.setInterval(function () {
+							IntervalDosPontinhos = window.setInterval(function () {
 								$(span).text('.'.repeat(++tick % 3 + 1));
 							}, 1000);
 						})
@@ -861,10 +1004,10 @@ $(function () {
 							'lang': 'en'
 						}).append('Loading'),
 	
-						$('<span>').each(function () {
+					 	$('<span>').each(function () {
 							var tick = 0;
 							const span = this
-							window.setInterval(function () {
+							IntervalDosPontinhos = window.setInterval(function () {
 								$(span).text('.'.repeat(++tick % 3 + 1));
 							}, 1000);
 						})
@@ -914,6 +1057,7 @@ $(function () {
 						me.draw();
 					};
 					const start = function () {
+						clearInterval(IntervalDosPontinhos);
 						var red_points;
 						$('body').append(
 							red_points = $('<p>', {

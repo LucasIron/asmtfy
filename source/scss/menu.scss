@@ -215,7 +215,7 @@ ul, h1, h2, h3, p {
 .caixa.howto {
 	font-size: 20px;
 	img {
-		max-width: 30%;
+		max-width: 75%;
 	}
 
 	ul {
@@ -315,4 +315,40 @@ ul, h1, h2, h3, p {
 			}
 		}
 	}
+}
+
+.slick-arrow::before {
+    content: none;
+}
+
+.slick-arrow {
+    width: 25px;
+    height: 25px;
+    border: solid white 0px;
+    transform: translateX(50%) translateY(-50%) rotate(45deg);
+}
+
+.slick-prev {
+    border-left-width: 3px;
+    border-bottom-width: 3px;
+}
+
+.slick-next {
+    border-top-width: 3px;
+    border-right-width: 3px;
+}
+
+.btn.prev {
+	margin-right: 10px;
+}
+
+.login.wrapper {
+    position: relative;
+}
+
+.login.wrapper .btn.close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translateY(-20%) translateX(40%);
 }
