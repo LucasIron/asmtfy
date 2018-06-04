@@ -60,6 +60,3 @@ typings/
 #mongodb data
 data/
 db/
-
-public/
-#final code

@@ -21,7 +21,9 @@ $(function () {
 		$(this).closest('.popup').stop().fadeOut(250);
 	});
 	
-	localStorage.setItem('lang', 'pt-br');
+    if (localStorage.getItem('lang') === null) localStorage.setItem('lang', 'pt-br');
+
+    $('html').attr('lang', localStorage.getItem('lang'));
 
 	$('.btn.portugues').click(function () {
 		$(this).addClass('active').siblings('.btn').removeClass('active');
@@ -50,7 +52,7 @@ $(function () {
 	var audio_btn = $('<audio>', {
 		'id': 'audio-btn',
 		'preload': 'auto',
-		'src': '/mp3/s_button.mp3'
+		'src': './mp3/s_button.mp3'
 	}).get(0);
 
 	$('.btn').click(function (event) {
@@ -88,44 +90,35 @@ $(function () {
 					if (data == 0) return $(form).find('input[name="name"]').val('').end().find('input[name="pass"]').val('');
 
 					$(form).closest('.popup').stop().fadeOut(250);
-					$('.frame.menu').stop().fadeOut(250);
-					$('.frame.arenas').find('.grande, .pequeno').append([
-						'flat',
-						'wall'
-					].map(function (arena) {
-						return $('<li>').append($('<img>', {
-							'src': '/assets/arenas/' + arena + '/' + arena + '.jpg'
-						})).data('name', arena);
-					})).end().stop().fadeIn(250, function () {
-						$(this).find('.grande').slick({
-							'arrows': false,
-							'fade': true,
-							'infinite': true,
-							'dots': false,
-							'asNavFor': '.pequeno'
-						}).end().find('.pequeno').slick({
-							'slidesToShow': 1,
-							'asNavFor': '.grande',
-							'infinite': true,
-							'dots': false,
-							'centerMode': true
-						});
-					});
 				}
 			});
 		});
 	});
 
 	$('button.newgame').click(function () {
-		$('.popup.login.signin').stop().fadeIn(250);
-		$('.caixa.login').find('form')
-		.find('input[name="name"]')
-			.val(Cookies.get('name'))
-		.end()
-		.find('input[name="pass"]')
-			.val(Cookies.get('pass'))
-		.end()
-		.submit();
+        $('.frame.menu').stop().fadeOut(250);
+        $('.frame.arenas').find('.grande, .pequeno').append([
+            'flat',
+            'wall'
+        ].map(function (arena) {
+            return $('<li>').append($('<img>', {
+                'src': './assets/arenas/' + arena + '/' + arena + '.jpg'
+            })).data('name', arena);
+        })).end().stop().fadeIn(250, function () {
+            $(this).find('.grande').slick({
+                'arrows': false,
+                'fade': true,
+                'infinite': true,
+                'dots': false,
+                'asNavFor': '.pequeno'
+            }).end().find('.pequeno').slick({
+                'slidesToShow': 1,
+                'asNavFor': '.grande',
+                'infinite': true,
+                'dots': false,
+                'centerMode': true
+            });
+        });
 	});
 	
 	$('.frame.arenas').find('.btn.prev').click(function () {
@@ -136,39 +129,6 @@ $(function () {
 	});
 
 	$('.frame.arenas').find('.btn.next').click(function () {
-		Cookies.set('arena', $('.frame.arenas').find('.slick-active').data('name'));
-		$(this).closest('.frame').stop().fadeOut(250);
-		$('.frame.chars').fadeIn(250, function () {
-			$(this).find('ul.chars').append([
-				'red',
-				'yellow'
-			].map(function (char) {
-				return $('<li>').append(
-					$('<input>', {
-						'type': 'radio',
-						'name': 'char',
-						'id': 'char-' + char,
-						'value': char
-					}).prop('checked', true),
-
-					$('<label>', {
-						'for': 'char-' + char
-					}).append($('<img>', {
-						'src': '/assets/chars/' + char + '/idle/0.png'
-					}))
-				).data('name', char);
-			}));
-		});
-	});
-	
-	$('.frame.chars').find('.btn.prev').click(function () {
-		$(this).closest('.frame').stop().fadeOut(250);
-		$('.frame.arenas').fadeIn(250);
-	});
-
-	$('.frame.chars').find('.next').click(function () {
-		Cookies.set('char', $('.frame.chars').find('input[type="radio"]:checked').val());
-
-		window.location = '/game';
+		location = './game.html?arena=' + $('.frame.arenas').find('.slick-active').data('name');
 	});
 });

@@ -1,8 +1,8 @@
 {
-  "name": "asmtfy",
-  "version": "1.0.0",
+  "name": "arcane-school",
+  "version": "0.0.5",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,29 +10,28 @@
     "type": "git",
     "url": "git+https://github.com/LucasIron/asmtfy.git"
   },
-  "keywords": [],
+  "keywords": [
+    "game",
+    "html5",
+    "node.js"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/LucasIron/asmtfy/issues"
   },
   "homepage": "https://github.com/LucasIron/asmtfy#readme",
-  "dependencies": {
-    "body-parser": "^1.18.2",
-    "cookie-parser": "^1.4.3",
-    "express": "^4.15.3",
-    "jquery": "^3.2.1",
-    "mongodb": "^2.2.33",
-    "mongoose": "^4.11.6",
-    "socket.io": "^2.0.4"
-  },
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
     "gulp": "^3.9.1",
-    "gulp-autoprefixer": "^4.0.0",
-    "gulp-babel": "^7.0.0",
-    "gulp-clean-css": "^3.9.0",
-    "gulp-sass": "^3.1.0"
+    "gulp-autoprefixer": "^5.0.0",
+    "gulp-babel": "^7.0.1",
+    "gulp-clean-css": "^3.9.4",
+    "gulp-sass": "^4.0.1"
+  },
+  "dependencies": {
+    "express": "^4.16.3",
+    "jquery": "^3.3.1"
   }
 }

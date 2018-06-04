@@ -7,7 +7,6 @@ const babel = require('gulp-babel');
 gulp.task('vendors', function () {
 	[
 		'jquery/dist/jquery.min.js',
-		'socket.io-client/dist/socket.io.slim.js'
 	].forEach(function (file) {
 		gulp.src('./node_modules/' + file)
 			.pipe(gulp.dest('./public/js'));
@@ -20,8 +19,8 @@ gulp.task('assets', function () {
 });
 
 gulp.task('html', function () {
-	gulp.src('./source/html/**/*.html')
-		.pipe(gulp.dest('./public/html'));
+	gulp.src('./source/**/*.html')
+		.pipe(gulp.dest('./public'));
 });
 
 gulp.task('scss', function () {

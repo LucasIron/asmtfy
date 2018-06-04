@@ -23,7 +23,7 @@ html:lang(en) {
 	top: 0;
 	width: 100%;
 	min-height: 100vh;
-	background-image: url(/img/nuvens.png);
+	background-image: url(../img/nuvens.png);
 }
 
 .front {
@@ -57,9 +57,9 @@ button {
 	text-transform: uppercase;
 	border-image-slice: 7 9 fill;
 	border-image-width: 10.5px 13.5px;
-	border-image-source: url(/img/button.png);
+	border-image-source: url(../img/button.png);
 	&.active, &:hover {
-		border-image-source: url(/img/button_hover.png);
+		border-image-source: url(../img/button_hover.png);
 	}
 }
 
@@ -115,7 +115,7 @@ button {
 	padding: 15px;
 	border-image-slice: 19 fill;
 	border-image-width: 30px;
-	border-image-source: url(/img/caixa_molde.png);
+	border-image-source: url(../img/caixa_molde.png);
 	color: white;
 	max-height: 90vh;
 	display: flex;
@@ -168,7 +168,7 @@ button {
 			content: '';
 			width: 25px;
 			height: 25px;
-			background-image: url(/img/sound.png);
+			background-image: url(../img/sound.png);
 			background-size: contain;
 			background-position: center;
 			background-repeat: no-repeat;
@@ -188,7 +188,7 @@ button {
 		content: '';
 		width: 25px;
 		height: 25px;
-		background-image: url(/img/mute.png);
+		background-image: url(../img/mute.png);
 		background-size: contain;
 		background-position: center;
 		background-repeat: no-repeat;
