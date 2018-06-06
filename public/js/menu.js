@@ -5,11 +5,11 @@ $(function () {
 	$('.popup').hide();
 	$('.front').find('img').hide();
 	$('.front').show();
-	$('.front').find('img').first().fadeIn(0, function fadeLoop() {
-		$(this).fadeOut(0, function () {
-			if ($(this).next('img').length) return $(this).next('img').fadeIn(0, fadeLoop);
+	$('.front').find('img').first().fadeIn(1500, function fadeLoop() {
+		$(this).fadeOut(1500, function () {
+			if ($(this).next('img').length) return $(this).next('img').fadeIn(1500, fadeLoop);
 			$('.front').hide(function () {
-				$('.menu').fadeIn(0);
+				$('.menu').fadeIn(1500);
 			});
 		});
 	});
