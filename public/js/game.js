@@ -966,8 +966,8 @@ $(function () {
 					return h;
 				};
 				this.w = w;
-				var adj = gamepads()[0].axes[2]; // trocar para gamepad 1
-				var opo = gamepads()[0].axes[3]; // trocar para gamepad 1
+				var adj = gamepads()[1].axes[2]; // trocar para gamepad 1
+				var opo = gamepads()[1].axes[3]; // trocar para gamepad 1
 				var ang = Math.atan2(opo, adj);
 				var fx = Math.cos(ang) * power * 0.5;
 				var fy = Math.sin(ang) * power * 0.5;
@@ -1111,8 +1111,8 @@ $(function () {
 					return h;
 				};
 				this.w = w;
-				var adj = gamepads()[0].axes[2]; // trocar para gamepad 1
-				var opo = gamepads()[0].axes[3]; // trocar para gamepad 1
+				var adj = gamepads()[1].axes[2]; // trocar para gamepad 1
+				var opo = gamepads()[1].axes[3]; // trocar para gamepad 1
 				var ang = Math.atan2(opo, adj);
 				var fx = Math.cos(ang) * power * 0.5;
 				var fy = Math.sin(ang) * power * 0.5;
@@ -1291,10 +1291,10 @@ $(function () {
 					$('.yellow_inner_power_bar').css({
 						'width': power / max_power * 100 + '%'
 					});
-					if (atk_btn_press == 5 && !gamepads()[0].buttons[atk_btn_press].pressed) {
+					if (atk_btn_press == 5 && !gamepads()[1].buttons[atk_btn_press].pressed) {
 						char.state(attack);
 					}
-					if (atk_btn_press == 7 && !gamepads()[0].buttons[atk_btn_press].pressed) {
+					if (atk_btn_press == 7 && !gamepads()[1].buttons[atk_btn_press].pressed) {
 						char.state(attack2);
 					}
 				};
@@ -1304,7 +1304,7 @@ $(function () {
 				this.start = function () {
 					power = 0;
 					animation.start();
-					if (gamepads()[0].buttons[5].pressed) {
+					if (gamepads()[1].buttons[5].pressed) {
 						atk_btn_press = 5;
 					} else {
 						atk_btn_press = 7;
@@ -1461,8 +1461,8 @@ $(function () {
 				this.update = function () {
 					if (!animation.update()) animation.start();
 					fy = 0;
-					dir = gamepads()[0].axes[0] > 0 ? 1 : -1; // se gamepad >0, entao 1 ,senao -1
-					fx = speed * gamepads()[0].axes[0];
+					dir = gamepads()[1].axes[0] > 0 ? 1 : -1; // se gamepad >0, entao 1 ,senao -1
+					fx = speed * gamepads()[1].axes[0];
 					x += fx * delta;
 					fy += arena.g;
 					y += fy;
@@ -1481,13 +1481,13 @@ $(function () {
 						}
 					} else char.state(fall);
 
-					if (gamepads()[0].buttons[5].pressed || gamepads()[0].buttons[7].pressed) {
+					if (gamepads()[1].buttons[5].pressed || gamepads()[1].buttons[7].pressed) {
 						yellow.state(charge);
 					}
-					if (gamepads()[0].axes[0] > -0.2 && gamepads()[0].axes[0] < 0.2) {
+					if (gamepads()[1].axes[0] > -0.2 && gamepads()[1].axes[0] < 0.2) {
 						yellow.state(idle);
 					}
-					if (gamepads()[0].buttons[0].pressed) {
+					if (gamepads()[1].buttons[0].pressed) {
 						yellow.state(jump);
 					}
 				};
@@ -1531,13 +1531,13 @@ $(function () {
 							}
 						}
 
-						if (gamepads()[0].buttons[5].pressed || gamepads()[0].buttons[7].pressed) {
+						if (gamepads()[1].buttons[5].pressed || gamepads()[1].buttons[7].pressed) {
 							yellow.state(charge);
 						}
-						if (gamepads()[0].axes[0] < -0.2 || gamepads()[0].axes[0] > 0.2) {
+						if (gamepads()[1].axes[0] < -0.2 || gamepads()[1].axes[0] > 0.2) {
 							yellow.state(run);
 						}
-						if (gamepads()[0].buttons[0].pressed) {
+						if (gamepads()[1].buttons[0].pressed) {
 							yellow.state(jump);
 						}
 					} else char.state(fall);
@@ -1834,7 +1834,7 @@ $(function () {
 			//propriedades e alterações da HUD
 			var update = function update() {
 				//				if (red) $('.loading').remove();
-				if (gamepads()[0] && gamepads()[0] && arena && red && yellow) game.state(new function Partida() {
+				if (gamepads()[0] && gamepads()[1] && arena && red && yellow) game.state(new function Partida() {
 					partida = this;
 					var update = function update() {
 						if (+$('.red_points').text() >= 1000) {
@@ -1848,7 +1848,7 @@ $(function () {
 							return;
 						}
 
-						if (gamepads()[0] && gamepads()[0]) {
+						if (gamepads()[0] && gamepads()[1]) {
 							$('#erro-controle').hide();
 							if (!pause) {
 								$('.options').hide();
