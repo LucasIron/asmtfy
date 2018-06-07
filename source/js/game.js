@@ -130,8 +130,8 @@ $(function () {
 				this.y = () => y;
 				this.h = () => h;
 				this.w = w;
-				var adj = gamepads()[0].axes[2]; //troquei parar testar a yellow
-				var opo = gamepads()[0].axes[3];
+				var adj = gamepads()[window.redControllerIndex].axes[2]; //troquei parar testar a yellow
+				var opo = gamepads()[window.redControllerIndex].axes[3];
 				var ang = Math.atan2(opo, adj);
 				var fx = Math.cos(ang) * power * 0.5;
 				var fy = Math.sin(ang) * power * 0.5;
@@ -148,9 +148,6 @@ $(function () {
 							'src': path + 'tiro/' + i + '.png'
 						}).get(0);
 					}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 					var animation = new Animation(images, 0.3);
 					this.update = function () {
 						if (!animation.update()) {
@@ -167,7 +164,7 @@ $(function () {
                             y1: tiro.y(),
                             y2: tiro.y() + tiro.w
                         })) tiro.state(explosion);
-                        else if (!overlap(tiro.x(), tiro.x() + tiro.w, 0, 1)) tiro.state(explosion);
+                        else if (!overlap(tiro.x(), tiro.x() + tiro.w, 0, 1)) tiro	.state(explosion);
 					}
 
 					this.draw = function () {
@@ -176,13 +173,11 @@ $(function () {
 
 					this.start = function () {
                         animation.start();
-                        /*if ($('#som').prop('checked')) s_fly_fireball.play();*/
-                        
 					}
 
 					this.end = function () {
-					/*	s_fly_fireball.pause();
-                        s_fly_fireball.currentTime = 0;*/
+						// s_fly_fireball.pause();
+                        // s_fly_fireball.currentTime = 0;
 					}
 				})();
 
@@ -198,12 +193,8 @@ $(function () {
 							'src': './assets/explosion/' + i + '.png'
 						}).get(0);
 					}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 					var animation = new Animation(images, 1);
 					this.update = function () {
-					//		arena.destroy(tiro);
 					}
 
 					this.draw = function () {
@@ -229,7 +220,6 @@ $(function () {
                             y2: tiro.y() + tiro.w
                         })) 
 						{
-							//true
                             yellow.hit();
 							$('.red_points').text(+$('.red_points').text() > 800 ? 1000 : +$('.red_points').text() + 200);
 							$('.red_inner_score_bar').css('width', (+$('.red_points').text() / 10) + '%');
@@ -285,8 +275,8 @@ $(function () {
 				this.y = () => y;
 				this.h = () => h;
 				this.w = w;
-				var adj = gamepads()[0].axes[2]; //troquei parar testar a yellow
-				var opo = gamepads()[0].axes[3];
+				var adj = gamepads()[window.redControllerIndex].axes[2]; //troquei parar testar a yellow
+				var opo = gamepads()[window.redControllerIndex].axes[3];
 				var ang = Math.atan2(opo, adj);
 				var fx = Math.cos(ang) * power * 0.5;
 				var fy = Math.sin(ang) * power * 0.5;
@@ -303,9 +293,6 @@ $(function () {
 							'src': path + 'tiro/' + i + '.png'
 						}).get(0);
 					}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 					var animation = new Animation(images, 0.3);
 					this.update = function () {
 						if (!animation.update()) {
@@ -331,13 +318,9 @@ $(function () {
 
 					this.start = function () {
                         animation.start();
-                        /*if ($('#som').prop('checked')) s_fly_fireball.play();*/
-                        
 					}
 
 					this.end = function () {
-					/*	s_fly_fireball.pause();
-                        s_fly_fireball.currentTime = 0;*/
 					}
 				})();
 
@@ -353,12 +336,8 @@ $(function () {
 							'src': './assets/explosion/' + i + '.png'
 						}).get(0);
 					}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 					var animation = new Animation(images, 1);
 					this.update = function () {
-					//		arena.destroy(tiro);
 					}
 
 					this.draw = function () {
@@ -409,9 +388,6 @@ $(function () {
 						'src': path + 'attack/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 0.5);
 				this.update = function () {
 					if (!animation.update()) {
@@ -436,9 +412,6 @@ $(function () {
 						'src': path + 'attack/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 0.5);
 				this.update = function () {
 					if (!animation.update()) {
@@ -472,9 +445,6 @@ $(function () {
 						'src': path + 'charge/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 0.5);
 				this.update = function () {
 					if (!animation.update()) animation.start();
@@ -487,10 +457,10 @@ $(function () {
 						'width': power / max_power * 100 + '%'
 					})
 				
-                    if (atk_btn_press == 5 && !gamepads()[0].buttons[atk_btn_press].pressed ) {
+                    if (atk_btn_press == 5 && !gamepads()[window.redControllerIndex].buttons[atk_btn_press].pressed ) {
 							char.state(attack);
 					}
-					if (atk_btn_press == 7 && !gamepads()[0].buttons[atk_btn_press].pressed ) {
+					if (atk_btn_press == 7 && !gamepads()[window.redControllerIndex].buttons[atk_btn_press].pressed ) {
 							char.state(attack2);
 					}
 					
@@ -501,7 +471,7 @@ $(function () {
 				this.start = function () {
 					power = 0;
 					animation.start();
-					if (gamepads()[0].buttons[5].pressed)
+					if (gamepads()[window.redControllerIndex].buttons[5].pressed)
 					{
 						atk_btn_press = 5;
 					}
@@ -509,16 +479,6 @@ $(function () {
 					{
 						atk_btn_press = 7;
 					}
-					//console.log(atk_btn_press);
-					
-					/*$(canvas).on("mouseup.red", function (event) {
-						mouseup = event;
-						if (event.button == 0){
-							char.state(attack);
-						}else if (event.button == 2){
-							char.state(attack2);
-						}
-					});*/
                     if ($('#som').prop('checked')) s_cast_magic.play();
                     
 					
@@ -528,7 +488,6 @@ $(function () {
 				}
 // alterar aqui com o gamepad
 				this.end = function () {
-					//$(canvas).off('mouseup.red');
                     s_cast_magic.pause();
                     s_cast_magic.currentTime = 0;
 				}
@@ -541,9 +500,6 @@ $(function () {
 						'src': path + 'fall/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 1);
 				this.update = function () {
 					if (!animation.update()) animation.start();
@@ -595,9 +551,6 @@ $(function () {
 						'src': path + 'hit/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 0.3);
 				this.update = function () {
 					if (!animation.update()) {
@@ -622,9 +575,6 @@ $(function () {
 						'src': path + 'jump/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 1);
 				this.update = function () {
 					if (!animation.update()) animation.start();
@@ -652,11 +602,6 @@ $(function () {
 				}
 				this.start = function () {
 					fy = -0.35;
-					/*$(window).on("keyup.yellow", function (event) {
-						keys = keys.filter(function (key) {
-							return key !== event.key;
-						});
-					});*/
 					
 					animation.start();
 				}
@@ -680,15 +625,12 @@ $(function () {
 						'src': path + 'run/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 1);
 				this.update = function () {
 					if (!animation.update()) animation.start();
 					fy = 0;
-					dir = gamepads()[0].axes[0] > 0 ? 1 : -1;
-					fx = speed * gamepads()[0].axes[0];
+					dir = gamepads()[window.redControllerIndex].axes[0] > 0 ? 1 : -1;
+					fx = speed * gamepads()[window.redControllerIndex].axes[0];
 					x += fx * delta;
 					fy += arena.g;
 					y += fy;
@@ -707,15 +649,15 @@ $(function () {
 						}
 					} else char.state(fall);
 					
-                    if (gamepads()[0].buttons[5].pressed || gamepads()[0].buttons[7].pressed)
+                    if (gamepads()[window.redControllerIndex].buttons[5].pressed || gamepads()[window.redControllerIndex].buttons[7].pressed)
 					{
 						red.state(charge);
 					}
-					if (gamepads()[0].axes[0] > -0.2 && gamepads()[0].axes[0] < 0.2 )
+					if (gamepads()[window.redControllerIndex].axes[0] > -0.2 && gamepads()[window.redControllerIndex].axes[0] < 0.2 )
 					{
 						red.state(idle);
 					}
-					if (gamepads()[0].buttons[0].pressed)
+					if (gamepads()[window.redControllerIndex].buttons[0].pressed)
 					{
 						red.state(jump);
 					}
@@ -743,17 +685,7 @@ $(function () {
 						'src': path + 'idle/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 1);
-//				var sound = $('<audio>', {
-//					'loop': true,
-//					'preload': 'auto',
-//					'src': 
-//				}).data('load', false).on('canplaythrough', function () {
-//					$(this).data('load', true).get(0);
-//				});
 				this.update = function () {
 					if (!animation.update()) animation.start();
 					fy = 0;
@@ -773,15 +705,15 @@ $(function () {
 								}
 							}
 						}
-						if (gamepads()[0].buttons[5].pressed || gamepads()[0].buttons[7].pressed)
+						if (gamepads()[window.redControllerIndex].buttons[5].pressed || gamepads()[window.redControllerIndex].buttons[7].pressed)
 						{
 							red.state(charge);
 						}
-						if (gamepads()[0].axes[0] >= 0.2 || gamepads()[0].axes[0] <= -0.2)
+						if (gamepads()[window.redControllerIndex].axes[0] >= 0.2 || gamepads()[window.redControllerIndex].axes[0] <= -0.2)
 						{
 							red.state(run);
 						}
-						if (gamepads()[0].buttons[0].pressed)
+						if (gamepads()[window.redControllerIndex].buttons[0].pressed)
 						{
 							red.state(jump);
 						}
@@ -972,8 +904,8 @@ $(function () {
 				this.y = () => y;
 				this.h = () => h;
 				this.w = w;
-				var adj = gamepads()[0].axes[2];// trocar para gamepad 1
-				var opo = gamepads()[0].axes[3];// trocar para gamepad 1
+				var adj = gamepads()[window.yellowControllerIndex].axes[2];// trocar para gamepad 1
+				var opo = gamepads()[window.yellowControllerIndex].axes[3];// trocar para gamepad 1
 				var ang = Math.atan2(opo, adj);
 				var fx = Math.cos(ang) * power * 0.5;
 				var fy = Math.sin(ang) * power * 0.5;
@@ -990,9 +922,6 @@ $(function () {
 							'src': path + 'tiro/' + i + '.png'
 						}).get(0);
 					}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 					var animation = new Animation(images, 0.5);
 					this.update = function () {
 						if (!animation.update()) {
@@ -1032,12 +961,8 @@ $(function () {
 							'src': './assets/explosion/' + i + '.png'
 						}).get(0);
 					}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 					var animation = new Animation(images, 1);
 					this.update = function () {
-					//		arena.destroy(tiro);
 					}
 
 					this.draw = function () {
@@ -1051,8 +976,6 @@ $(function () {
 						x -= w / 2;
 						y -= w / 2;
 						animation.start();
-						//console.log('w do char', char.w);
-						//console.log('x y w do tiro', tiro.x(), tiro.y(), tiro.w);
 						arena.destroy(tiro);
 						if (red.conflict({
                             x1: tiro.x(),
@@ -1117,8 +1040,8 @@ $(function () {
 				this.y = () => y;
 				this.h = () => h;
 				this.w = w;
-				var adj = gamepads()[0].axes[2];// trocar para gamepad 1
-				var opo = gamepads()[0].axes[3];// trocar para gamepad 1
+				var adj = gamepads()[window.yellowControllerIndex].axes[2];// trocar para gamepad 1
+				var opo = gamepads()[window.yellowControllerIndex].axes[3];// trocar para gamepad 1
 				var ang = Math.atan2(opo, adj);
 				var fx = Math.cos(ang) * power * 0.5;
 				var fy = Math.sin(ang) * power * 0.5;
@@ -1135,9 +1058,6 @@ $(function () {
 							'src': path + 'tiro/' + i + '.png'
 						}).get(0);
 					}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 					var animation = new Animation(images, 0.5);
 					this.update = function () {
 						if (!animation.update()) {
@@ -1177,9 +1097,6 @@ $(function () {
 							'src': './assets/explosion/' + i + '.png'
 						}).get(0);
 					}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 					var animation = new Animation(images, 1);
 					this.update = function () {
 					//		arena.destroy(tiro);
@@ -1196,8 +1113,6 @@ $(function () {
 						x -= w / 2;
 						y -= w / 2;
 						animation.start();
-						//console.log('w do char', char.w);
-						//console.log('x y w do tiro', tiro.x(), tiro.y(), tiro.w);
 						arena.destroy(tiro);
 						if (red.conflict({
                             x1: tiro.x(),
@@ -1230,9 +1145,6 @@ $(function () {
 						'src': path + 'attack/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 0.5);
 				this.update = function () {
 					if (!animation.update()) {
@@ -1258,9 +1170,6 @@ $(function () {
 						'src': path + 'attack/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 0.5);
 				this.update = function () {
 					if (!animation.update()) {
@@ -1292,9 +1201,6 @@ $(function () {
 						'src': path + 'charge/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 0.5);
 				this.update = function () {
 					if (!animation.update()) animation.start();
@@ -1306,10 +1212,10 @@ $(function () {
 					$('.yellow_inner_power_bar').css({
 						'width': power / max_power * 100 + '%'
 					})
-                    if (atk_btn_press == 5 && !gamepads()[0].buttons[atk_btn_press].pressed ) {
+                    if (atk_btn_press == 5 && !gamepads()[window.yellowControllerIndex].buttons[atk_btn_press].pressed ) {
 							char.state(attack);
 					}
-					if (atk_btn_press == 7 && !gamepads()[0].buttons[atk_btn_press].pressed ) {
+					if (atk_btn_press == 7 && !gamepads()[window.yellowControllerIndex].buttons[atk_btn_press].pressed ) {
 							char.state(attack2);
 					}   
 				}
@@ -1319,7 +1225,7 @@ $(function () {
 				this.start = function () {
 					power = 0;
 					animation.start();
-				    if (gamepads()[0].buttons[5].pressed)
+				    if (gamepads()[window.yellowControllerIndex].buttons[5].pressed)
 					{
 						atk_btn_press = 5;
 					}
@@ -1332,9 +1238,7 @@ $(function () {
 						event.preventDefault();
 					});    
 				}
-//mudar com o gamepad
 				this.end = function () {
-					//$(canvas).off('mouseup.yellow');
 				}
 			})();
 //---------------------------------------------
@@ -1345,9 +1249,6 @@ $(function () {
 						'src': path + 'fall/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 1);
 				this.update = function () {
 					if (!animation.update()) animation.start();
@@ -1398,9 +1299,6 @@ $(function () {
 						'src': path + 'hit/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
                 var animation = new Animation(images, 0.5);
 				
 				this.update = function () {
@@ -1426,9 +1324,6 @@ $(function () {
 						'src': path + 'jump/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 1);
 				this.update = function () {
 					if (!animation.update()) animation.start();
@@ -1456,11 +1351,6 @@ $(function () {
 				}
 				this.start = function () {
 					fy = -0.35;
-					/*$(window).on("keyup.yellow", function (event) {
-						keys = keys.filter(function (key) {
-							return key !== event.key;
-						});
-					});*/
                     animation.start();
 				}
 				this.end = function () {
@@ -1477,15 +1367,12 @@ $(function () {
 						'src': path + 'run/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 1);
 				this.update = function () {
 					if (!animation.update()) animation.start();
 					fy = 0;
-                    dir = gamepads()[0].axes[0] > 0 ? 1 : -1;// se gamepad >0, entao 1 ,senao -1
-					fx = speed * gamepads()[0].axes[0];
+                    dir = gamepads()[window.yellowControllerIndex].axes[0] > 0 ? 1 : -1;// se gamepad >0, entao 1 ,senao -1
+					fx = speed * gamepads()[window.yellowControllerIndex].axes[0];
 					x += fx * delta;
 					fy += arena.g;
 					y += fy;
@@ -1504,15 +1391,15 @@ $(function () {
 						}
 					} else char.state(fall);
                     
-                    if (gamepads()[0].buttons[5].pressed || gamepads()[0].buttons[7].pressed)
+                    if (gamepads()[window.yellowControllerIndex].buttons[5].pressed || gamepads()[window.yellowControllerIndex].buttons[7].pressed)
 					{
 						yellow.state(charge);
 					}
-					if (gamepads()[0].axes[0] > -0.2 && gamepads()[0].axes[0] < 0.2 )
+					if (gamepads()[window.yellowControllerIndex].axes[0] > -0.2 && gamepads()[window.yellowControllerIndex].axes[0] < 0.2 )
 					{
 						yellow.state(idle);
 					}
-					if (gamepads()[0].buttons[0].pressed)
+					if (gamepads()[window.yellowControllerIndex].buttons[0].pressed)
 					{
 						yellow.state(jump);
 					}  
@@ -1534,9 +1421,6 @@ $(function () {
 						'src': path + 'idle/' + i + '.png'
 					}).get(0);
 				}
-                images.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 				var animation = new Animation(images, 1);
 				this.update = function () {
 					if (!animation.update()) animation.start();
@@ -1558,15 +1442,15 @@ $(function () {
 							}
 						}
                         
-                        if (gamepads()[0].buttons[5].pressed || gamepads()[0].buttons[7].pressed)
+                        if (gamepads()[window.yellowControllerIndex].buttons[5].pressed || gamepads()[window.yellowControllerIndex].buttons[7].pressed)
 						{
 							yellow.state(charge);
 						}
-						if (gamepads()[0].axes[0] < -0.2 || gamepads()[0].axes[0] > 0.2)
+						if (gamepads()[window.yellowControllerIndex].axes[0] < -0.2 || gamepads()[window.yellowControllerIndex].axes[0] > 0.2)
 						{
 							yellow.state(run);
 						}
-						if (gamepads()[0].buttons[0].pressed)
+						if (gamepads()[window.yellowControllerIndex].buttons[0].pressed)
 						{
 							yellow.state(jump);
 						}
@@ -1712,14 +1596,11 @@ $(function () {
 						'src': './assets/arenas/' + molde.name + '/' + i + '.png'
 					}).get(0);
 				}
-                layers.forEach(function (image) {
-                    image.crossOrigin = "Anonymous";
-                });
 
 				const ground = $('<img>', {
 					'src': './assets/arenas/' + molde.name + '/ground.png'
 				}).get(0);
-                ground.crossOrigin = "Anonymous";
+				this.ground = ground;
 
 				const wind = {
 					fx: molde.fx,
@@ -1901,7 +1782,7 @@ $(function () {
 //propriedades e alterações da HUD
 			const update = function () {
 //				if (red) $('.loading').remove();
-				if (gamepads()[0] && gamepads()[0] && arena && red && yellow) game.state(new function Partida() {
+				if (window.redControllerIndex && window.yellowControllerIndex && arena && arena.ground.complete && red && yellow) game.state(new function Partida() {
                     partida = this;
 					const update = function () {
                         if (+$('.red_points').text() >= 1000) {
@@ -1915,7 +1796,7 @@ $(function () {
                             return
                         }
 
-						if (gamepads()[0] && gamepads()[0])
+						if (window.redControllerIndex && window.yellowControllerIndex)
 						{
 							$('#erro-controle').hide();
                             if (!pause) {
@@ -1939,7 +1820,7 @@ $(function () {
 					};
 					const start = function () {
 						clearInterval(IntervalDosPontinhos);
-					//	if ($('#som').prop('checked')) battle_theme.play();
+						if ($('#som').prop('checked')) battle_theme.play();
 						$('<div id="erro-controle"><span lang="pt-br">conecte o controle</span><span lang="en">plug-in the gamepad</span></div>').css({
 							width: '100vw',
 							height: '100vh',
@@ -2401,13 +2282,23 @@ $(function () {
 	
 	window.addEventListener("gamepadconnected", function(event)
 	{
-		console.log("pad conectado:" , gamepads());
+		var indexes = [].reduce.call(gamepads(), function (indexes, gamepad) {
+			if (gamepad && gamepad.buttons.length) indexes.push(gamepad.index);
+			return indexes;
+		}, []);
+		window.redControllerIndex = indexes[0];
+		window.yellowControllerIndex = indexes[1];
 	} );
 	
 	
 	window.addEventListener("gamepaddisconnected", function(event)
 	{
-		console.log("pad desconectado:" );	
+		var indexes = [].reduce.call(gamepads(), function (indexes, gamepad) {
+			if (gamepad && gamepad.buttons.length) indexes.push(gamepad.index);
+			return indexes;
+		}, []);
+		window.redControllerIndex = indexes[0];
+		window.yellowControllerIndex = indexes[1];
 	} );
 	
 	window.requestAnimationFrame(function loop() {
@@ -2476,6 +2367,5 @@ $(function () {
 });
 
 $(window).on('keyup', function (event) {
-    console.log(event.key);
     if (event.key == 'Escape') pause = !pause;
 });
