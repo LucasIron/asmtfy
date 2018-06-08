@@ -1711,8 +1711,7 @@ $(function () {
 
 			//propriedades e alterações da HUD
 			var update = function update() {
-				//				if (red) $('.loading').remove();
-				if (window.redControllerIndex && window.yellowControllerIndex && arena && arena.ground.complete && red && yellow) game.state(new function Partida() {
+				if (window.redControllerIndex !== undefined && window.yellowControllerIndex !== undefined && arena && arena.ground.complete && red && yellow) game.state(new function Partida() {
 					partida = this;
 					var update = function update() {
 						if (+$('.red_points').text() >= 1000) {
@@ -1726,7 +1725,7 @@ $(function () {
 							return;
 						}
 
-						if (window.redControllerIndex && window.yellowControllerIndex) {
+						if (window.redControllerIndex != undefined && window.yellowControllerIndex != undefined) {
 							$('#erro-controle').hide();
 							if (!pause) {
 								$('.options').hide();
@@ -2122,6 +2121,7 @@ $(function () {
 	};
 
 	window.addEventListener("gamepadconnected", function (event) {
+		console.log(gamepads());
 		var indexes = [].reduce.call(gamepads(), function (indexes, gamepad) {
 			if (gamepad && gamepad.buttons.length) indexes.push(gamepad.index);
 			return indexes;
