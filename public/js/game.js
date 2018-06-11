@@ -1,10 +1,5 @@
 'use strict';
 
-/*
-precisamos fazer:
-fazer os cooldowns
-arrumar os creditos eo os nomes dos professores e as instruções!!!!!
-*/
 var pause;
 
 $(function () {
@@ -26,19 +21,16 @@ $(function () {
 	var IntervalDosPontinhos;
 	var game = new function () {
 
-		//char red
-
 		function Red(molde) {
-			//char RED
 			var char = this;
 			var state;
 			var x = molde.x;
-			var y = 0;
+			var y = 0.5;
 			var name = molde.name;
 			var path = './assets/chars/' + molde.name + '/';
 			var fx = 0;
 			var fy = 0;
-			var w = molde.w; //0.035
+			var w = molde.w;
 			this.w = w;
 			var h;
 			var speed = molde.speed;
@@ -144,153 +136,7 @@ $(function () {
 					return h;
 				};
 				this.w = w;
-				var adj = gamepads()[window.redControllerIndex].axes[2]; //troquei parar testar a yellow
-				var opo = gamepads()[window.redControllerIndex].axes[3];
-				var ang = Math.atan2(opo, adj);
-				var fx = Math.cos(ang) * power * 0.5;
-				var fy = Math.sin(ang) * power * 0.5;
-				this.update = function () {
-					state.update();
-				};
-				this.draw = function () {
-					state.draw();
-				};
-				var fly = new function Fly() {
-					var images = [];
-					for (var i = 0; i < molde.tiro; i++) {
-						images[i] = $('<img>', {
-							'src': path + 'tiro/' + i + '.png'
-						}).get(0);
-					}
-					var animation = new Animation(images, 0.3);
-					this.update = function () {
-						if (!animation.update()) {
-							animation.start();
-						}
-
-						fy += arena.g;
-						y += fy * delta;
-						x += fx * delta;
-						if (arena.conflict(tiro)) tiro.state(explosion);else if (yellow.conflict({
-							x1: tiro.x(),
-							x2: tiro.x() + tiro.w,
-							y1: tiro.y(),
-							y2: tiro.y() + tiro.w
-						})) tiro.state(explosion);else if (!overlap(tiro.x(), tiro.x() + tiro.w, 0, 1)) tiro.state(explosion);
-					};
-
-					this.draw = function () {
-						animation.draw();
-					};
-
-					this.start = function () {
-						animation.start();
-					};
-
-					this.end = function () {
-						// s_fly_fireball.pause();
-						// s_fly_fireball.currentTime = 0;
-					};
-				}();
-
-				var explosion = new function Explosion() {
-					var s_explosion = $('<audio>', {
-						'id': 'audio-btn',
-						'preload': 'auto',
-						'src': './mp3/s_explosion.mp3'
-					}).get(0);
-					var images = [];
-					for (var i = 0; i < 8; i++) {
-						images[i] = $('<img>', {
-							'src': './assets/explosion/' + i + '.png'
-						}).get(0);
-					}
-					var animation = new Animation(images, 1);
-					this.update = function () {};
-
-					this.draw = function () {
-						if (animation.update()) return animation.draw();
-						this.end();
-					};
-
-					this.start = function () {
-						if ($('#som').prop('checked')) s_explosion.play();
-
-						w *= 5;
-						tiro.w = w;
-						x -= w / 2;
-						y -= w / 2;
-						animation.start();
-
-						arena.destroy(tiro);
-
-						if (yellow.conflict({
-							x1: tiro.x(),
-							x2: tiro.x() + tiro.w,
-							y1: tiro.y(),
-							y2: tiro.y() + tiro.w
-						})) {
-							yellow.hit();
-							$('.red_points').text(+$('.red_points').text() > 800 ? 1000 : +$('.red_points').text() + 200);
-							$('.red_inner_score_bar').css('width', +$('.red_points').text() / 10 + '%');
-							if (+$('.red_points').text() >= 1000) {}
-						}; //verifica colisao e da pontos
-					};
-
-					this.end = function () {
-						tiros.shift(); //deveria tirar a si proprio
-					};
-				}();
-				this.state(fly);
-			}
-
-			function Tiro2(x, y, w) {
-				var tiro = this;
-				var dir = 1;
-				var h = 0;
-				var fy = 0;
-				var state;
-
-				function Animation(images, length) {
-					length = length * 1000;
-					var zero = Date.now();
-					var atual;
-					this.start = function () {
-						zero = Date.now();
-						atual = 0;
-					};
-					this.update = function () {
-						atual = Math.floor((Date.now() - zero) / (length / images.length));
-						if (atual >= images.length) return false;
-						h = images[atual].height / images[atual].width * (w * canvas.width);
-						return true;
-					};
-					this.draw = function () {
-						ctx.save();
-						ctx.translate(canvas.width * x, canvas.height * y);
-						ctx.scale(dir, 1);
-						ctx.drawImage(images[atual], 0, 0, w * canvas.width * dir, h);
-						ctx.restore();
-					};
-				}
-				this.state = function (estado) {
-					if (estado) {
-						if (state) state.end();
-						state = estado;
-						state.start();
-					}
-				};
-				this.x = function () {
-					return x;
-				};
-				this.y = function () {
-					return y;
-				};
-				this.h = function () {
-					return h;
-				};
-				this.w = w;
-				var adj = gamepads()[window.redControllerIndex].axes[2]; //troquei parar testar a yellow
+				var adj = gamepads()[window.redControllerIndex].axes[2];
 				var opo = gamepads()[window.redControllerIndex].axes[3];
 				var ang = Math.atan2(opo, adj);
 				var fx = Math.cos(ang) * power * 0.5;
@@ -373,22 +219,163 @@ $(function () {
 							y1: tiro.y(),
 							y2: tiro.y() + tiro.w
 						})) {
-							//true
 							yellow.hit();
-							$('.red_points').text(+$('.red_points').text() > 800 ? 1000 : +$('.red_points').text() + 300);
+							$('.red_points').text(+$('.red_points').text() > 800 ? 1000 : +$('.red_points').text() + 200);
 							$('.red_inner_score_bar').css('width', +$('.red_points').text() / 10 + '%');
 							if (+$('.red_points').text() >= 1000) {}
-						}; //verifica colisao e da pontos
+						};
 					};
 
 					this.end = function () {
-						tiros.shift(); //deveria tirar a si proprio
+						tiros.shift();
 					};
 				}();
 				this.state(fly);
 			}
 
-			//-------------------estados do RED-------------------------------------------------------------------------------			
+			function Tiro2(x, y, w) {
+				var tiro = this;
+				var dir = 1;
+				var h = 0;
+				var fy = 0;
+				var state;
+
+				function Animation(images, length) {
+					length = length * 1000;
+					var zero = Date.now();
+					var atual;
+					this.start = function () {
+						zero = Date.now();
+						atual = 0;
+					};
+					this.update = function () {
+						atual = Math.floor((Date.now() - zero) / (length / images.length));
+						if (atual >= images.length) return false;
+						h = images[atual].height / images[atual].width * (w * canvas.width);
+						return true;
+					};
+					this.draw = function () {
+						ctx.save();
+						ctx.translate(canvas.width * x, canvas.height * y);
+						ctx.scale(dir, 1);
+						ctx.drawImage(images[atual], 0, 0, w * canvas.width * dir, h);
+						ctx.restore();
+					};
+				}
+				this.state = function (estado) {
+					if (estado) {
+						if (state) state.end();
+						state = estado;
+						state.start();
+					}
+				};
+				this.x = function () {
+					return x;
+				};
+				this.y = function () {
+					return y;
+				};
+				this.h = function () {
+					return h;
+				};
+				this.w = w;
+				var adj = gamepads()[window.redControllerIndex].axes[2];
+				var opo = gamepads()[window.redControllerIndex].axes[3];
+				var ang = Math.atan2(opo, adj);
+				var fx = Math.cos(ang) * power * 0.5;
+				var fy = Math.sin(ang) * power * 0.5;
+				this.update = function () {
+					state.update();
+				};
+				this.draw = function () {
+					state.draw();
+				};
+				var fly = new function Fly() {
+					var images = [];
+					for (var i = 0; i < molde.tiro; i++) {
+						images[i] = $('<img>', {
+							'src': path + 'tiro/' + i + '.png'
+						}).get(0);
+					}
+					var animation = new Animation(images, 0.3);
+					this.update = function () {
+						if (!animation.update()) {
+							animation.start();
+						}
+
+						fy += arena.g;
+						y += fy * delta;
+						x += fx * delta;
+						if (arena.conflict(tiro)) tiro.state(explosion);else if (yellow.conflict({
+							x1: tiro.x(),
+							x2: tiro.x() + tiro.w,
+							y1: tiro.y(),
+							y2: tiro.y() + tiro.w
+						})) tiro.state(explosion);else if (!overlap(tiro.x(), tiro.x() + tiro.w, 0, 1)) tiro.state(explosion);
+					};
+
+					this.draw = function () {
+						animation.draw();
+					};
+
+					this.start = function () {
+						animation.start();
+					};
+
+					this.end = function () {};
+				}();
+
+				var explosion = new function Explosion() {
+					var s_explosion = $('<audio>', {
+						'id': 'audio-btn',
+						'preload': 'auto',
+						'src': './mp3/s_explosion.mp3'
+					}).get(0);
+					var images = [];
+					for (var i = 0; i < 8; i++) {
+						images[i] = $('<img>', {
+							'src': './assets/explosion/' + i + '.png'
+						}).get(0);
+					}
+					var animation = new Animation(images, 1);
+					this.update = function () {};
+
+					this.draw = function () {
+						if (animation.update()) return animation.draw();
+						this.end();
+					};
+
+					this.start = function () {
+						if ($('#som').prop('checked')) s_explosion.play();
+
+						w *= 5;
+						tiro.w = w;
+						x -= w / 2;
+						y -= w / 2;
+						animation.start();
+
+						arena.destroy(tiro);
+
+						if (yellow.conflict({
+							x1: tiro.x(),
+							x2: tiro.x() + tiro.w,
+							y1: tiro.y(),
+							y2: tiro.y() + tiro.w
+						})) {
+							yellow.hit();
+							$('.red_points').text(+$('.red_points').text() > 800 ? 1000 : +$('.red_points').text() + 300);
+							$('.red_inner_score_bar').css('width', +$('.red_points').text() / 10 + '%');
+							if (+$('.red_points').text() >= 1000) {}
+						};
+					};
+
+					this.end = function () {
+						tiros.shift();
+					};
+				}();
+				this.state(fly);
+			}
+
 			var attack = new function Attack() {
 				var images = [];
 				for (var i = 0; i < molde.attack; i++) {
@@ -413,7 +400,6 @@ $(function () {
 			}();
 
 			var attack2 = new function Attack2() {
-				//copia, deletar depois
 				var images = [];
 				for (var i = 0; i < molde.attack; i++) {
 					images[i] = $('<img>', {
@@ -488,10 +474,8 @@ $(function () {
 						event.preventDefault();
 					});
 				};
-				// alterar aqui com o gamepad
 				this.end = function () {
 					s_cast_magic.pause();
-					s_cast_magic.currentTime = 0;
 				};
 			}();
 
@@ -716,12 +700,11 @@ $(function () {
 				this.end = function () {};
 				this.load = function () {
 					return !images.find(function (image) {
-						return !image.width; /* && !$(sound).data('load')*/
+						return !image.width;
 					});
 				};
 			}();
 
-			//-------------------------------------fim dos estados do RED-------------------------------------------------------------------
 			state = idle;
 			state.start();
 
@@ -773,24 +756,18 @@ $(function () {
 			this.run = function () {
 				this.state(run);
 			};
-		} //fim do char red
-
-		//-- fim dos estados do red-------------------------------------------------------------------------------
-
-
-		//char yellow
+		}
 
 		function Yellow(molde) {
-			//char YELLOW
 			var char = this;
 			var state;
 			var x = molde.x;
-			var y = 0;
+			var y = 0.5;
 			var name = molde.name;
 			var path = './assets/chars/' + molde.name + '/';
 			var fx = 0;
 			var fy = 0;
-			var w = molde.w; //0.035
+			var w = molde.w;
 			this.w = w;
 			var h;
 			var speed = molde.speed;
@@ -897,8 +874,8 @@ $(function () {
 					return h;
 				};
 				this.w = w;
-				var adj = gamepads()[window.yellowControllerIndex].axes[2]; // trocar para gamepad 1
-				var opo = gamepads()[window.yellowControllerIndex].axes[3]; // trocar para gamepad 1
+				var adj = gamepads()[window.yellowControllerIndex].axes[2];
+				var opo = gamepads()[window.yellowControllerIndex].axes[3];
 				var ang = Math.atan2(opo, adj);
 				var fx = Math.cos(ang) * power * 0.5;
 				var fy = Math.sin(ang) * power * 0.5;
@@ -944,6 +921,11 @@ $(function () {
 				}();
 
 				var explosion = new function Explosion() {
+					var s_explosion = $('<audio>', {
+						'id': 'audio-btn',
+						'preload': 'auto',
+						'src': './mp3/s_explosion.mp3'
+					}).get(0);
 					var images = [];
 					for (var i = 0; i < 8; i++) {
 						images[i] = $('<img>', {
@@ -959,6 +941,8 @@ $(function () {
 					};
 
 					this.start = function () {
+						if ($('#som').prop('checked')) s_explosion.play();
+
 						w *= 5;
 						tiro.w = w;
 						x -= w / 2;
@@ -979,7 +963,7 @@ $(function () {
 					};
 
 					this.end = function () {
-						tiros.shift(); //deveria tirar a si proprio
+						tiros.shift();
 					};
 				}();
 				this.state(fly);
@@ -1032,8 +1016,8 @@ $(function () {
 					return h;
 				};
 				this.w = w;
-				var adj = gamepads()[window.yellowControllerIndex].axes[2]; // trocar para gamepad 1
-				var opo = gamepads()[window.yellowControllerIndex].axes[3]; // trocar para gamepad 1
+				var adj = gamepads()[window.yellowControllerIndex].axes[2];
+				var opo = gamepads()[window.yellowControllerIndex].axes[3];
 				var ang = Math.atan2(opo, adj);
 				var fx = Math.cos(ang) * power * 0.5;
 				var fy = Math.sin(ang) * power * 0.5;
@@ -1079,6 +1063,11 @@ $(function () {
 				}();
 
 				var explosion = new function Explosion() {
+					var s_explosion = $('<audio>', {
+						'id': 'audio-btn',
+						'preload': 'auto',
+						'src': './mp3/s_explosion.mp3'
+					}).get(0);
 					var images = [];
 					for (var i = 0; i < 8; i++) {
 						images[i] = $('<img>', {
@@ -1086,9 +1075,7 @@ $(function () {
 						}).get(0);
 					}
 					var animation = new Animation(images, 1);
-					this.update = function () {
-						//		arena.destroy(tiro);
-					};
+					this.update = function () {};
 
 					this.draw = function () {
 						if (animation.update()) return animation.draw();
@@ -1096,6 +1083,8 @@ $(function () {
 					};
 
 					this.start = function () {
+						if ($('#som').prop('checked')) s_explosion.play();
+
 						w *= 5;
 						tiro.w = w;
 						x -= w / 2;
@@ -1116,13 +1105,12 @@ $(function () {
 					};
 
 					this.end = function () {
-						tiros.shift(); //deveria tirar a si proprio
+						tiros.shift();
 					};
 				}();
 				this.state(fly);
 			}
 
-			//-------------------estados do personagen-------------------------------------------------------------------------------			
 			var attack = new function Attack() {
 				var images = [];
 				for (var i = 0; i < molde.attack; i++) {
@@ -1146,7 +1134,6 @@ $(function () {
 				this.end = function () {};
 			}();
 
-			//ataque especial da yellow
 			var attack2 = new function Attack2() {
 				var images = [];
 				for (var i = 0; i < molde.attack; i++) {
@@ -1179,6 +1166,13 @@ $(function () {
 				var images = [];
 				var sizing = 1;
 				var atk_btn_press;
+
+				var s_cast_magic = $('<audio>', {
+					'id': 'audio-btn',
+					'preload': 'auto',
+					'src': './mp3/s_cast_magic.mp3',
+					'loop': true
+				}).get(0);
 				for (var i = 0; i < molde.charge; i++) {
 					images[i] = $('<img>', {
 						'src': path + 'charge/' + i + '.png'
@@ -1213,14 +1207,16 @@ $(function () {
 					} else {
 						atk_btn_press = 7;
 					}
+					if ($('#som').prop('checked')) s_cast_magic.play();
 
 					$(canvas).on('contextmenu', function (event) {
 						event.preventDefault();
 					});
 				};
-				this.end = function () {};
+				this.end = function () {
+					s_cast_magic.pause();
+				};
 			}();
-			//---------------------------------------------
 			var fall = new function Fall() {
 				var images = [];
 				for (var i = 0; i < molde.fall; i++) {
@@ -1334,6 +1330,12 @@ $(function () {
 			var keys = [];
 
 			var run = new function Run() {
+				var s_running = $('<audio>', {
+					'id': 'audio-btn',
+					'preload': 'auto',
+					'src': './mp3/s_running.mp3',
+					'loop': true
+				}).get(0);
 
 				var images = [];
 				for (var i = 0; i < molde.run; i++) {
@@ -1380,8 +1382,11 @@ $(function () {
 				};
 				this.start = function () {
 					animation.start();
+					if ($('#som').prop('checked')) s_running.play();
 				};
-				this.end = function () {};
+				this.end = function () {
+					s_running.pause();
+				};
 			}();
 
 			var idle = new function Idle() {
@@ -1432,7 +1437,7 @@ $(function () {
 				this.end = function () {};
 				this.load = function () {
 					return !images.find(function (image) {
-						return !image.width; /* && !$(sound).data('load')*/
+						return !image.width;
 					});
 				};
 			}();
@@ -1487,13 +1492,9 @@ $(function () {
 			};
 		}
 
-		//-- fim dos estados da yellow-------------------------------------------------------------------------------------------------------------
-
-
-		//variaveis q ele carrega quando faz a conexao
 		var partida;
 		var red = new Red({
-			x: 0.4,
+			x: 0.2,
 			w: 0.035,
 			name: 'red',
 			idle: 6,
@@ -1508,7 +1509,7 @@ $(function () {
 		});
 
 		var yellow = new Yellow({
-			x: 0.6,
+			x: 0.8,
 			w: 0.025,
 			name: 'yellow',
 			idle: 5,
@@ -1522,7 +1523,6 @@ $(function () {
 			tiro: 3
 		});
 
-		//propriedades da arena -------------------------------------------------------------------------------------------------------------------------
 		var molde_arena;
 		var arena_name = location.search.split('?')[1].split('arena=')[1].split('&')[0] || 'flat';
 		switch (arena_name) {
@@ -1566,7 +1566,7 @@ $(function () {
 				fx: molde.fx,
 				fy: molde.fy,
 				prob: molde.prob,
-				amax: molde.amax, //aceleração max e min
+				amax: molde.amax,
 				amin: molde.amin
 			};
 
@@ -1599,7 +1599,6 @@ $(function () {
 
 				var collider_data = aux_ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-				// otimizar essa função
 				for (var _i = 0; _i < canvas.width; _i++) {
 					for (var j = 0; j < canvas.height; j++) {
 						var distancia = Math.sqrt(Math.pow(Math.abs(x + w / 2 - _i), 2) + Math.pow(Math.abs(y + w / 2 - j), 2));
@@ -1641,10 +1640,7 @@ $(function () {
 				return load();
 			};
 		}(molde_arena);
-		//fim das prorpiedades da arena
 
-
-		//inicio dos estados...-----------------------------------------------------------------------------------------------------------------------------
 		var state;
 		this.state = function (estado) {
 			if (estado) {
@@ -1709,7 +1705,6 @@ $(function () {
 				$('.loading, .waiting, .arena').remove();
 			};
 
-			//propriedades e alterações da HUD
 			var update = function update() {
 				if (window.redControllerIndex !== undefined && window.yellowControllerIndex !== undefined && arena && arena.ground.complete && red && yellow) game.state(new function Partida() {
 					partida = this;
@@ -2109,9 +2104,7 @@ $(function () {
 		}();
 		state.start();
 	}();
-	//fim dos estados -----------------------------------------------------------------------------------------------------------------------------
 
-	//conexãoes dos comtroles, e configs de botões e css----------------------------------------------------------------------------------------------  
 	var now;
 	var delta;
 	var before;
@@ -2179,8 +2172,6 @@ $(function () {
 		localStorage.setItem('som', $(this).prop('checked'));
 		if (battle_theme) battle_theme[$(this).prop('checked') ? 'play' : 'pause']();
 	}).change();
-
-	//variaveis dos sons--------------------------------------------------------------------------------------------------------------
 
 	var audio_btn = $('<audio>', {
 		'id': 'audio-btn',

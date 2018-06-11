@@ -1,8 +1,3 @@
-/*
-precisamos fazer:
-fazer os cooldowns
-arrumar os creditos eo os nomes dos professores e as instruções!!!!!
-*/
 var pause;
 
 $(function () {
@@ -24,18 +19,16 @@ $(function () {
 	var IntervalDosPontinhos;
 	const game = new (function () {
 
-//char red
-           
-	function Red(molde) {//char RED
+		function Red(molde) {
 			const char = this;
 			var state;
 			var x = molde.x;
-			var y = 0;
+			var y = 0.5;
 			var name = molde.name;
 			var path = './assets/chars/' + molde.name + '/'
 			var fx = 0;
 			var fy = 0;
-			const w = molde.w;//0.035
+			const w = molde.w;
 			this.w = w;
 			var h;
 			var speed = molde.speed;
@@ -130,7 +123,7 @@ $(function () {
 				this.y = () => y;
 				this.h = () => h;
 				this.w = w;
-				var adj = gamepads()[window.redControllerIndex].axes[2]; //troquei parar testar a yellow
+				var adj = gamepads()[window.redControllerIndex].axes[2];
 				var opo = gamepads()[window.redControllerIndex].axes[3];
 				var ang = Math.atan2(opo, adj);
 				var fx = Math.cos(ang) * power * 0.5;
@@ -176,8 +169,6 @@ $(function () {
 					}
 
 					this.end = function () {
-						// s_fly_fireball.pause();
-                        // s_fly_fireball.currentTime = 0;
 					}
 				})();
 
@@ -225,11 +216,11 @@ $(function () {
 							$('.red_inner_score_bar').css('width', (+$('.red_points').text() / 10) + '%');
                             if (+$('.red_points').text() >= 1000) {
                             }
-						}; //verifica colisao e da pontos
+						};
 					}
 
 					this.end = function () {
-						tiros.shift();//deveria tirar a si proprio
+						tiros.shift();
 					}
 				})();
 				this.state(fly);
@@ -275,7 +266,7 @@ $(function () {
 				this.y = () => y;
 				this.h = () => h;
 				this.w = w;
-				var adj = gamepads()[window.redControllerIndex].axes[2]; //troquei parar testar a yellow
+				var adj = gamepads()[window.redControllerIndex].axes[2];
 				var opo = gamepads()[window.redControllerIndex].axes[3];
 				var ang = Math.atan2(opo, adj);
 				var fx = Math.cos(ang) * power * 0.5;
@@ -363,24 +354,22 @@ $(function () {
                             y2: tiro.y() + tiro.w
                         })) 
 						{
-							//true
                             yellow.hit();
 							$('.red_points').text(+$('.red_points').text() > 800 ? 1000 : +$('.red_points').text() + 300);
 							$('.red_inner_score_bar').css('width', (+$('.red_points').text() / 10) + '%');
                             if (+$('.red_points').text() >= 1000) {
                             }
-						}; //verifica colisao e da pontos
+						};
 					}
 
 					this.end = function () {
-						tiros.shift();//deveria tirar a si proprio
+						tiros.shift();
 					}
 				})();
 				this.state(fly);
 			}
 		
 		
-//-------------------estados do RED-------------------------------------------------------------------------------			
 			const attack = new (function Attack() {
 				var images = [];
 				for (let i = 0; i < molde.attack; i++) {
@@ -405,7 +394,7 @@ $(function () {
 				}
 			})();
 			
-			const attack2 = new (function Attack2() {//copia, deletar depois
+			const attack2 = new (function Attack2() {
 				var images = [];
 				for (let i = 0; i < molde.attack; i++) {
 					images[i] = $('<img>', {
@@ -486,10 +475,8 @@ $(function () {
 						event.preventDefault();
 					});
 				}
-// alterar aqui com o gamepad
 				this.end = function () {
                     s_cast_magic.pause();
-                    s_cast_magic.currentTime = 0;
 				}
 			})();
 
@@ -731,12 +718,11 @@ $(function () {
 				this.end = function () {}
 				this.load = function () {
 					return !images.find(function (image) {
-						return !image.width /* && !$(sound).data('load')*/
-					})
+						return !image.width;
+					});
 				}
 			})();
         
-//-------------------------------------fim dos estados do RED-------------------------------------------------------------------
 			state = idle;
 			state.start();
 
@@ -790,23 +776,18 @@ $(function () {
 			this.run = function () {
 				this.state(run);
 			}
-		}//fim do char red
-		
-//-- fim dos estados do red-------------------------------------------------------------------------------
-
-
-//char yellow
+		}
         
-        function Yellow(molde) {//char YELLOW
+        function Yellow(molde) {
 			const char = this;
 			var state;
 			var x = molde.x;
-			var y = 0;
+			var y = 0.5;
 			var name = molde.name;
 			var path = './assets/chars/' + molde.name + '/'
 			var fx = 0;
 			var fy = 0;
-			const w = molde.w;//0.035
+			const w = molde.w;
 			this.w = w;
 			var h;
 			var speed = molde.speed;
@@ -904,8 +885,8 @@ $(function () {
 				this.y = () => y;
 				this.h = () => h;
 				this.w = w;
-				var adj = gamepads()[window.yellowControllerIndex].axes[2];// trocar para gamepad 1
-				var opo = gamepads()[window.yellowControllerIndex].axes[3];// trocar para gamepad 1
+				var adj = gamepads()[window.yellowControllerIndex].axes[2];
+				var opo = gamepads()[window.yellowControllerIndex].axes[3];
 				var ang = Math.atan2(opo, adj);
 				var fx = Math.cos(ang) * power * 0.5;
 				var fy = Math.sin(ang) * power * 0.5;
@@ -955,6 +936,11 @@ $(function () {
 				})();
 
 				var explosion = new(function Explosion() {
+                    var s_explosion = $('<audio>', {
+                        'id': 'audio-btn',
+                        'preload': 'auto',
+                        'src': './mp3/s_explosion.mp3'
+                    }).get(0);
 					var images = [];
 					for (let i = 0; i < 8; i++) {
 						images[i] = $('<img>', {
@@ -971,6 +957,8 @@ $(function () {
 					}
 
 					this.start = function () {
+						if ($('#som').prop('checked')) s_explosion.play();
+
 						w *= 5;
 						tiro.w = w;
 						x -= w / 2;
@@ -993,7 +981,7 @@ $(function () {
 					}
 
 					this.end = function () {
-						tiros.shift();//deveria tirar a si proprio
+						tiros.shift();
 					}
 				})();
 				this.state(fly);
@@ -1040,8 +1028,8 @@ $(function () {
 				this.y = () => y;
 				this.h = () => h;
 				this.w = w;
-				var adj = gamepads()[window.yellowControllerIndex].axes[2];// trocar para gamepad 1
-				var opo = gamepads()[window.yellowControllerIndex].axes[3];// trocar para gamepad 1
+				var adj = gamepads()[window.yellowControllerIndex].axes[2];
+				var opo = gamepads()[window.yellowControllerIndex].axes[3];
 				var ang = Math.atan2(opo, adj);
 				var fx = Math.cos(ang) * power * 0.5;
 				var fy = Math.sin(ang) * power * 0.5;
@@ -1091,6 +1079,11 @@ $(function () {
 				})();
 
 				var explosion = new(function Explosion() {
+                    var s_explosion = $('<audio>', {
+                        'id': 'audio-btn',
+                        'preload': 'auto',
+                        'src': './mp3/s_explosion.mp3'
+                    }).get(0);
 					var images = [];
 					for (let i = 0; i < 8; i++) {
 						images[i] = $('<img>', {
@@ -1099,7 +1092,6 @@ $(function () {
 					}
 					var animation = new Animation(images, 1);
 					this.update = function () {
-					//		arena.destroy(tiro);
 					}
 
 					this.draw = function () {
@@ -1108,6 +1100,8 @@ $(function () {
 					}
 
 					this.start = function () {
+						if ($('#som').prop('checked')) s_explosion.play();
+
 						w *= 5;
 						tiro.w = w;
 						x -= w / 2;
@@ -1130,14 +1124,13 @@ $(function () {
 					}
 
 					this.end = function () {
-						tiros.shift();//deveria tirar a si proprio
+						tiros.shift();
 					}
 				})();
 				this.state(fly);
 			}	
 
 			
-//-------------------estados do personagen-------------------------------------------------------------------------------			
 			const attack = new (function Attack() {
 				var images = [];
 				for (let i = 0; i < molde.attack; i++) {
@@ -1162,7 +1155,6 @@ $(function () {
 				}
 			})();
 			
-			//ataque especial da yellow
 			const attack2 = new (function Attack2() {
 				var images = [];
 				for (let i = 0; i < molde.attack; i++) {
@@ -1196,6 +1188,13 @@ $(function () {
 				var images = [];
 				var sizing = 1;
                 var atk_btn_press;
+                
+                var s_cast_magic = $('<audio>', {
+                    'id': 'audio-btn',
+                    'preload': 'auto',
+                    'src': './mp3/s_cast_magic.mp3',
+                    'loop': true
+                }).get(0);
 				for (let i = 0; i < molde.charge; i++) {
 					images[i] = $('<img>', {
 						'src': path + 'charge/' + i + '.png'
@@ -1233,15 +1232,16 @@ $(function () {
 					{
 						atk_btn_press = 7;
 					}
+                    if ($('#som').prop('checked')) s_cast_magic.play();
 					
 					$(canvas).on('contextmenu', function (event) {
 						event.preventDefault();
 					});    
 				}
 				this.end = function () {
+                    s_cast_magic.pause();
 				}
 			})();
-//---------------------------------------------
 			const fall = new (function Fall() {
 				var images = [];
 				for (let i = 0; i < molde.fall; i++) {
@@ -1360,6 +1360,12 @@ $(function () {
 			var keys = [];
 			
 			const run = new (function Run() {
+                var s_running = $('<audio>', {
+                    'id': 'audio-btn',
+                    'preload': 'auto',
+                    'src': './mp3/s_running.mp3',
+                    'loop': true
+                }).get(0);
 				
 				var images = [];
 				for (let i = 0; i < molde.run; i++) {
@@ -1409,8 +1415,10 @@ $(function () {
 				}
 				this.start = function () {
 					animation.start();
+				    if($('#som').prop('checked')) s_running.play();
 				}
 				this.end = function () {
+					s_running.pause();
 				}
 			})();
 			
@@ -1468,8 +1476,8 @@ $(function () {
 				this.end = function () {}
 				this.load = function () {
 					return !images.find(function (image) {
-						return !image.width /* && !$(sound).data('load')*/
-					})
+						return !image.width;
+					});
 				}
 			})();
 			
@@ -1524,14 +1532,10 @@ $(function () {
 			}
 		}
 
-//-- fim dos estados da yellow-------------------------------------------------------------------------------------------------------------
-
-
-//variaveis q ele carrega quando faz a conexao
         var partida;
 		var red = new Red(
 			{
-				x: 0.4,
+				x: 0.2,
 				w: 0.035,
 				name: 'red',
 				idle: 6,
@@ -1547,7 +1551,7 @@ $(function () {
 				
 		var yellow = new Yellow(
 			{
-				x: 0.6,
+				x: 0.8,
 				w: 0.025,
 				name: 'yellow',
 				idle: 5,
@@ -1562,7 +1566,6 @@ $(function () {
 			});
 
 		
-//propriedades da arena -------------------------------------------------------------------------------------------------------------------------
         var molde_arena;
         var arena_name = location.search.split('?')[1].split('arena=')[1].split('&')[0] || 'flat';
 		switch (arena_name) {
@@ -1606,7 +1609,7 @@ $(function () {
 					fx: molde.fx,
 					fy: molde.fy,
 					prob: molde.prob,
-					amax: molde.amax, //aceleração max e min
+					amax: molde.amax,
 					amin: molde.amin
 				};
 				
@@ -1643,7 +1646,6 @@ $(function () {
 					
 					var collider_data = aux_ctx.getImageData(0, 0, canvas.width, canvas.height);
 		
-					// otimizar essa função
 					for (let i = 0; i < canvas.width; i++) {
 						for (let j = 0; j < canvas.height; j++) {
 							var distancia = Math.sqrt((Math.abs((x + (w / 2)) - i)**2) + (Math.abs((y + (w / 2)) - j)**2));
@@ -1691,10 +1693,8 @@ $(function () {
 					return load();
 				};
 			})(molde_arena);
-//fim das prorpiedades da arena
 		
 		
-//inicio dos estados...-----------------------------------------------------------------------------------------------------------------------------
 		var state;
 		this.state = function (estado) {
 			if (estado) {
@@ -1779,7 +1779,6 @@ $(function () {
 				$('.loading, .waiting, .arena').remove();
 			}
 			
-//propriedades e alterações da HUD
 			const update = function () {
 				if (window.redControllerIndex !== undefined && window.yellowControllerIndex !== undefined && arena && arena.ground.complete && red && yellow) game.state(new function Partida() {
                     partida = this;
@@ -2267,9 +2266,7 @@ $(function () {
 		})();
 		state.start();
 	})();
-//fim dos estados -----------------------------------------------------------------------------------------------------------------------------
 
-//conexãoes dos comtroles, e configs de botões e css----------------------------------------------------------------------------------------------  
     var now;
 	var delta;
 	var before;
@@ -2342,8 +2339,6 @@ $(function () {
         if (battle_theme) battle_theme[$(this).prop('checked') ? 'play' : 'pause']();
     }).change();
 
- //variaveis dos sons--------------------------------------------------------------------------------------------------------------
-    
     var audio_btn = $('<audio>', {
         'id': 'audio-btn',
         'preload': 'auto',
